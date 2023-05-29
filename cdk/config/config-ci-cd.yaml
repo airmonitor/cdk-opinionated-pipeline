@@ -1,0 +1,17 @@
+project: "cdk-opinionated-pipeline"
+aws_account: "045566859751"
+aws_region: "eu-central-1"
+repository: "cdk-opinionated-pipeline"
+ci_cd_notification_email: "tomasz.szuster@gmail.com"
+slack_workspace_id: "T4YVBTSNL" # CI/CD notifications through slack
+slack_channel_id: "" # CI/CD notifications through slack
+slack_channel_id_alarms: "" # Alarms
+alarm_emails:
+  - tomasz.szuster@gmail.com
+plugins:
+  # Pipeline plugin that starts this pipeline based on a SNS event from upstream CodePipeline.
+  # An example of upstream pipeline is docker build pipeline that create docker image used in this pipeline
+  pipeline_trigger: false
+  pipeline_trigger_ssm_parameters: []
+tags:
+  project: "cdk-opinionated-pipeline"

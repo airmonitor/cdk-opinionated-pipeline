@@ -53,13 +53,6 @@ We need to define flows between the application components.
 
 # Prerequisites
 
-For above please use script tools/create_ssm_parameters.py
-
-* Secret for GitHub access token in Secrets Manager
-  * sonyhive_ci_cd_pipeline_github_access_token
-
-For above please use script tools/create_secret_manager_secret.py
-
 To manually create a virtualenv on MacOS and Linux:
 
 ```
@@ -106,13 +99,3 @@ command.
 Enjoy!
 
 # Documentation
-
-The code documentation was created automatically by pydoctor using following command:
-
-```shell
-  pydoctor --docformat restructuredtext --make-html --html-output=docs/ci_cd sonyhive_ci_cd_pipeline
-```
-
-Documentation is placed in docs/ci_cd/index.html directory.
-
-**Please remember to update documentation using above command.**

@@ -29,15 +29,13 @@ class CodeQualityStack(cdk.Stack):
     def __init__(self, scope: Construct, construct_id: str, env, props, **kwargs) -> None:
         super().__init__(scope, construct_id, env=env, **kwargs)
         props_env: Dict[List, Dict] = {}
-
+        config_vars = ConfigurationVars(**props)
         # pylint: disable=W0612
-        for dir_path, dir_names, files in walk(f"cdk/config/{props['stage']}", topdown=False):
+        for dir_path, dir_names, files in walk(f"cdk/config/{config_vars.stage}", topdown=False):
             for file_name in files:
                 with open(path.join(dir_path, file_name), encoding="utf-8") as f:
                     props_env |= yaml.safe_load(f)
                     props = {**props_env, **props}
-
-        config_vars = ConfigurationVars(**props)
 
         ssm.StringParameter(
             self,

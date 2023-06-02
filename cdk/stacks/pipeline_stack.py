@@ -187,6 +187,30 @@ class PipelineStack(cdk.Stack):
             ],
         )
 
+        test_config_stack = pipelines.ShellStep(
+            "test_config_stack",
+            commands=[
+                "python3 -m pip install --upgrade pip",
+                "pip install -r requirements.txt",
+                "npm install -g aws-cdk",
+                "pip install -r cdk/stacks/requirements.txt",
+                "pip install pytest",
+                f"STAGE={props['stage']} pytest -v cdk/tests/unit/test_config_stack.py",
+            ],
+        )
+
+        test_notifications_stack = pipelines.ShellStep(
+            "test_notifications_stack",
+            commands=[
+                "python3 -m pip install --upgrade pip",
+                "pip install -r requirements.txt",
+                "npm install -g aws-cdk",
+                "pip install -r cdk/stacks/requirements.txt",
+                "pip install pytest",
+                f"STAGE={props['stage']} pytest -v cdk/tests/unit/test_notifications_stack.py",
+            ],
+        )
+
         ansible_lint = pipelines.ShellStep(
             "ansible-lint",
             commands=[
@@ -195,7 +219,7 @@ class PipelineStack(cdk.Stack):
             ],
         )
 
-        pre_jobs = [pre_commit]
+        pre_jobs = [pre_commit, test_config_stack, test_notifications_stack]
         if check_ansible_dir(directory="../ansible"):
             pre_jobs.append(ansible_lint)
 

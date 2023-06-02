@@ -195,7 +195,7 @@ class PipelineStack(cdk.Stack):
                 "npm install -g aws-cdk",
                 "pip install -r cdk/stacks/requirements.txt",
                 "pip install pytest",
-                f"STAGE={stage} pytest -v cdk/tests/unit/test_notifications_stack.py",
+                f"STAGE={props['stage']} pytest -v cdk/tests/unit/test_notifications_stack.py",
             ],
         )
 

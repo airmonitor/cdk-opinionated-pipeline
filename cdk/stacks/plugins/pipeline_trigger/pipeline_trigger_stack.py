@@ -11,10 +11,11 @@ from cdk.schemas.configuration_vars import ConfigurationVars, PipelineVars
 
 
 class PipelineTriggerStack(cdk.Stack):
-    """AWS Lambda that triggers this pipeline when upstream pipeline succeeded.
+    """AWS Lambda that triggers this pipeline when the upstream pipeline
+    succeeded.
 
-    This pipeline deploys a container image created in upstream pipeline
-    to ECS fargate
+    This pipeline deploys a container image created in the upstream
+    pipeline to ECS fargate
     """
 
     def __init__(self, scope: Construct, construct_id: str, env: cdk.Environment, props: dict, **kwargs) -> None:
@@ -30,10 +31,15 @@ class PipelineTriggerStack(cdk.Stack):
         config_vars = ConfigurationVars(**props)
         pipeline_vars = PipelineVars(**props)
 
+        # Filter all ssm parameters which have the name of the stage
+        filtered_ssm_parameters = list(
+            filter(lambda x: config_vars.stage in x, pipeline_vars.plugins.pipeline_trigger_ssm_parameters)
+        )
+
         event_pattern = events.EventPattern(
             source=["aws.ssm"],
             detail_type=["Parameter Store Change"],
-            detail={"name": pipeline_vars.plugins.pipeline_trigger_ssm_parameters, "operation": ["Create", "Update"]},
+            detail={"name": filtered_ssm_parameters, "operation": ["Create", "Update"]},
         )
 
         events_iam_role_policy = iam.PolicyDocument(

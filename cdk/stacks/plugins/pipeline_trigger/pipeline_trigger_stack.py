@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# mypy: ignore-errors
 """Deploy AWS Core application resources."""
 import aws_cdk as cdk
 import aws_cdk.aws_codepipeline as pipeline

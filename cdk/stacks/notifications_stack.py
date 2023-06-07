@@ -27,7 +27,7 @@ class NotificationsStack(cdk.Stack):
 
         :param scope: The AWS CDK parent class from which this class inherits
         :param construct_id: The name of CDK construct
-        :param env: Tha AWS CDK Environment class which provide AWS Account ID and AWS Region
+        :param env: Tha AWS CDK Environment class which provides AWS Account ID and AWS Region
         :param props: The dictionary which contain configuration values loaded initially from /config/config-env.yaml
         :param kwargs:
         """

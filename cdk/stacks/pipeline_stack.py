@@ -32,7 +32,7 @@ class PipelineStack(cdk.Stack):
 
         :param scope: The AWS CDK parent class from which this class inherits
         :param construct_id: The name of CDK construct
-        :param env: Tha AWS CDK Environment class which provide AWS Account ID and AWS Region
+        :param env: Tha AWS CDK Environment class which provides AWS Account ID and AWS Region
         :param props: The dictionary which contain configuration values loaded initially from /config/config-env.yaml
         :param kwargs:
         """
@@ -141,7 +141,7 @@ class PipelineStack(cdk.Stack):
             schedule=schedule,
         )
         trigger.add_target(events_targets.CodePipeline(self.codepipeline.pipeline))
-        apply_tags(props=props, resource=trigger)
+        apply_tags(props=props, resource=trigger)  # type: ignore
 
     def code_quality_stage(
         self,
@@ -152,7 +152,7 @@ class PipelineStack(cdk.Stack):
         pipeline_vars: PipelineVars,
     ) -> None:
         """Create CI/CD stage which contains several jobs for checking code
-        quality using various linters. Stage will be added to existing
+        quality using various linters. Stage will be added to an existing
         pipeline.
 
         :param pipeline_vars: Pydantic model that contains configuration values loaded initially from config files
@@ -188,6 +188,7 @@ class PipelineStack(cdk.Stack):
                 "pre-commit run --files cdk/stacks/plugins/pipeline_trigger/*.py",
                 "pre-commit run --files cdk/stages/*.py",
                 "pre-commit run --files cdk/utils/*.py",
+                "pre-commit run --files cdk/tests/infrastructure/*.py",
             ],
         )
 
@@ -199,7 +200,7 @@ class PipelineStack(cdk.Stack):
                 "npm install -g aws-cdk",
                 "pip install -r cdk/stacks/requirements.txt",
                 "pip install pytest",
-                f"STAGE={props['stage']} pytest -v cdk/tests/unit/test_notifications_stack.py",
+                f"STAGE={props['stage']} pytest -v cdk/tests/infrastructure/test_notifications_stack.py",
             ],
         )
 
@@ -228,7 +229,7 @@ class PipelineStack(cdk.Stack):
         """Create core shared resources stage.
 
         :param stage: The type of environment, example prod, ppe, dr
-        :param env: The AWS CDK Environment class which provide AWS Account ID and AWS Region
+        :param env: The AWS CDK Environment class which provides AWS Account ID and AWS Region
         :param pipeline: The AWS CDK pipelines CdkPipeline object
         :param props: The dictionary loaded from config directory
         :param pipeline_vars: Pydantic model that contains configuration values loaded initially from config files
@@ -244,7 +245,7 @@ class PipelineStack(cdk.Stack):
         pipeline.add_stage(stage=stage)
 
     def notifications_topic(self, pipeline_vars: PipelineVars) -> sns.Topic:
-        """Create SNS topic used in CI/CD notifications.
+        """Create an SNS topic used in CI/CD notifications.
 
         :param pipeline_vars: Pydantic model that contains configuration values loaded initially from config files
         :return sns.Topic: The AWS SNS Topic instance
@@ -271,7 +272,7 @@ class PipelineStack(cdk.Stack):
         """Create SNS subscription which will be used to send email
         notifications during CodePipeline execution.
 
-        :param sns_topic: The AWS SDK SNS topic instance
+        :param sns_topic: The AWS CDK SNS topic instance
         :return: None
         """
         sns_topic.add_to_resource_policy(
@@ -318,11 +319,11 @@ class PipelineStack(cdk.Stack):
         )
 
     def environment_type(self, env: cdk.Environment, stage: str, props: Dict):
-        """Create environment using dedicated AWS account, including different
-        AWS region.
+        """Create environment using a dedicated AWS account, including a
+        different AWS region.
 
         :param stage: The type of environment, example prod, ppe, dr
-        :param env: The AWS  CDK environment object.
+        :param env: The AWS CDK environment object.
         :param props: The dictionary loaded from config directory.
         """
         props_env: Dict[list, Dict] = {}
@@ -352,7 +353,7 @@ class PipelineStack(cdk.Stack):
         """Create Bots stage.
 
         :param stage: The type of environment, example prod, ppe, dr
-        :param env: The AWS CDK Environment class which provide AWS Account ID and AWS Region
+        :param env: The AWS CDK Environment class which provides AWS Account ID and AWS Region
         :param pipeline: The AWS CDK pipelines CdkPipeline object
         :param props: The dictionary loaded from config directory
         :param pipeline_vars: Pydantic model that contains configuration values loaded initially from config files

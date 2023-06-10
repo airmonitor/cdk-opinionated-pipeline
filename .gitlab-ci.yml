@@ -49,10 +49,15 @@ pre-commit-job:
       - python3 -m pip install --upgrade pip
       - pip install -r cdk/stacks/requirements.txt
       - pre-commit run --files app.py
+      - pre-commit run --files cdk/constructs/*.py
       - pre-commit run --files cdk/schemas/*.py
       - pre-commit run --files cdk/stacks/*.py
       - pre-commit run --files cdk/stages/*.py
+      - pre-commit run --files cdk/stacks/services/*.py
+      - pre-commit run --files cdk/stacks/plugins/*.py
+      - pre-commit run --files cdk/stacks/plugins/pipeline_trigger/*.py
       - pre-commit run --files cdk/utils/*.py
+      - pre-commit run --files cdk/tests/infrastructure/*.py
 
 build-on-mr:
   image: python:3.11.3-bullseye
@@ -74,9 +79,14 @@ pre-commit-on-mr:
       - python3 -m pip install --upgrade pip
       - pip install -r cdk/stacks/requirements.txt
       - pre-commit run --files app.py
+      - pre-commit run --files cdk/constructs/*.py
       - pre-commit run --files cdk/schemas/*.py
       - pre-commit run --files cdk/stacks/*.py
       - pre-commit run --files cdk/stages/*.py
+      - pre-commit run --files cdk/stacks/services/*.py
+      - pre-commit run --files cdk/stacks/plugins/*.py
+      - pre-commit run --files cdk/stacks/plugins/pipeline_trigger/*.py
       - pre-commit run --files cdk/utils/*.py
+      - pre-commit run --files cdk/tests/infrastructure/*.py
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'

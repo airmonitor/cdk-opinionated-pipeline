@@ -43,36 +43,37 @@ class PipelineTriggerStack(cdk.Stack):
             detail={"name": filtered_ssm_parameters, "operation": ["Create", "Update"]},
         )
 
-        events_iam_role_policy = iam.PolicyDocument(
-            statements=[
-                iam.PolicyStatement(
-                    actions=["codepipeline:StartPipelineExecution"],
-                    resources=[
-                        f"arn:aws:codepipeline:{config_vars.aws_region}:{config_vars.aws_account}:{config_vars.project}"
-                    ],
-                ),
-            ]
-        )
-        events_iam_role = iam.Role(
-            self,
-            id="events_iam_role",
-            role_name=f"{config_vars.project}-{config_vars.stage}-pipeline-trigger",
-            assumed_by=iam.ServicePrincipal(service="events.amazonaws.com"),
-            inline_policies={"allow_starting_codepipeline": events_iam_role_policy},
-        )
-
-        events.Rule(
-            self,
-            id="rule_start_codepipeline",
-            event_pattern=event_pattern,
-            targets=[
-                events_targets.CodePipeline(
-                    event_role=events_iam_role,
-                    pipeline=pipeline.Pipeline.from_pipeline_arn(
-                        self,
-                        id="imported_codepipeline",
-                        pipeline_arn=f"arn:aws:codepipeline:{config_vars.aws_region}:{config_vars.aws_account}:{config_vars.project}",
+        if filtered_ssm_parameters:
+            print(filtered_ssm_parameters)
+            events_iam_role_policy = iam.PolicyDocument(
+                statements=[
+                    iam.PolicyStatement(
+                        actions=["codepipeline:StartPipelineExecution"],
+                        resources=[
+                            f"arn:aws:codepipeline:{config_vars.aws_region}:{config_vars.aws_account}:{config_vars.project}"
+                        ],
                     ),
-                )
-            ],
-        )
+                ]
+            )
+            events_iam_role = iam.Role(
+                self,
+                id="events_iam_role",
+                role_name=f"{config_vars.project}-{config_vars.stage}-pipeline-trigger",
+                assumed_by=iam.ServicePrincipal(service="events.amazonaws.com"),
+                inline_policies={"allow_starting_codepipeline": events_iam_role_policy},
+            )
+            events.Rule(
+                self,
+                id="rule_start_codepipeline",
+                event_pattern=event_pattern,
+                targets=[
+                    events_targets.CodePipeline(
+                        event_role=events_iam_role,
+                        pipeline=pipeline.Pipeline.from_pipeline_arn(
+                            self,
+                            id="imported_codepipeline",
+                            pipeline_arn=f"arn:aws:codepipeline:{config_vars.aws_region}:{config_vars.aws_account}:{config_vars.project}",
+                        ),
+                    )
+                ],
+            )

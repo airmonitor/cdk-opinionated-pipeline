@@ -19,7 +19,7 @@ class CodeQualityStage(cdk.Stage):
 
         :param scope:
         :param construct_id:
-        :param env: Tha AWS CDK Environment class which provide AWS Account ID and AWS Region.
+        :param env: Tha AWS CDK Environment class which provides AWS Account ID and AWS Region.
         :param props:
         :param kwargs:
         """

@@ -15,8 +15,8 @@ class Observability(BaseModel):
 class PipelinePluginsVars(BaseModel):
     """Pipeline plugins variables."""
 
-    pipeline_trigger: Optional[bool]
-    pipeline_trigger_ssm_parameters: Optional[list]
+    pipeline_trigger: Optional[bool] = None
+    pipeline_trigger_ssm_parameters: Optional[list] = None
 
 
 class PipelineVars(BaseModel):
@@ -27,7 +27,7 @@ class PipelineVars(BaseModel):
     project: str
     repository: constr(min_length=3, max_length=255)  # type: ignore
     ci_cd_notification_email: EmailStr
-    slack_ci_cd_channel_id: Optional[constr(min_length=0, max_length=11)]  # type: ignore
+    slack_ci_cd_channel_id: Optional[constr(min_length=0, max_length=11)] = None  # type: ignore
 
     plugins: PipelinePluginsVars
 
@@ -42,6 +42,6 @@ class ConfigurationVars(PipelineVars):
 class NotificationVars(BaseModel):
     """Notification details, including email, slack, etc."""
 
-    slack_channel_id_alarms: Optional[constr(min_length=0, max_length=11)]  # type: ignore
-    slack_channel_id: Optional[constr(min_length=0, max_length=11)]  # type: ignore
+    slack_channel_id_alarms: Optional[constr(min_length=0, max_length=11)] = None  # type: ignore
+    slack_channel_id: Optional[constr(min_length=0, max_length=11)] = None  # type: ignore
     slack_workspace_id: constr(min_length=0, max_length=11)  # type: ignore

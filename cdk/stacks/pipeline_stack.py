@@ -55,7 +55,7 @@ class PipelineStack(cdk.Stack):
                 ],
                 build_environment=codebuild.BuildEnvironment(
                     compute_type=codebuild.ComputeType.SMALL,
-                    build_image=codebuild.LinuxBuildImage.AMAZON_LINUX_2_ARM_3,  # type: ignore
+                    build_image=codebuild.LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0,  # type: ignore
                 ),
             ),
             synth=pipelines.ShellStep(

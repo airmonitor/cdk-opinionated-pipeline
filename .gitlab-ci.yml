@@ -34,7 +34,7 @@ build-job:
   image: python:3.11.3-bullseye
   stage: build
   script:
-      - curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && apt-get install -y nodejs
+      - curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
       - npm i -g aws-cdk
       - pip install -r requirements.txt
       - pip install -r requirements-dev.txt
@@ -63,7 +63,7 @@ build-on-mr:
   image: python:3.11.3-bullseye
   stage: build-on-mr
   script:
-      - curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && apt-get install -y nodejs
+      - curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
       - npm i -g aws-cdk
       - pip install -r requirements.txt
       - pip install -r requirements-dev.txt

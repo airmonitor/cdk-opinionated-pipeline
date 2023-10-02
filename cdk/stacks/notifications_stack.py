@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Create AWS resources responsible for notifications.
 
 Example sns alarm topic
@@ -6,6 +5,7 @@ Example sns alarm topic
 import aws_cdk as cdk
 import aws_cdk.aws_chatbot as chatbot
 import aws_cdk.aws_iam as iam
+import aws_cdk.aws_logs as logs
 import aws_cdk.aws_sns_subscriptions as sns_subscriptions
 import aws_cdk.aws_ssm as ssm
 from aws_cdk import Aspects
@@ -25,10 +25,13 @@ class NotificationsStack(cdk.Stack):
     def __init__(self, scope: Construct, construct_id: str, env: cdk.Environment, props: dict, **kwargs) -> None:
         """Initialize default parameters from AWS CDK and configuration file.
 
-        :param scope: The AWS CDK parent class from which this class inherits
+        :param scope: The AWS CDK parent class from which this class
+            inherits
         :param construct_id: The name of CDK construct
-        :param env: Tha AWS CDK Environment class which provides AWS Account ID and AWS Region
-        :param props: The dictionary which contain configuration values loaded initially from /config/config-env.yaml
+        :param env: Tha AWS CDK Environment class which provides AWS
+            Account ID and AWS Region
+        :param props: The dictionary which contain configuration values
+            loaded initially from /config/config-env.yaml
         :param kwargs:
         """
         super().__init__(scope, construct_id, env=env, **kwargs)
@@ -62,6 +65,42 @@ class NotificationsStack(cdk.Stack):
             )
 
         if notification_vars.slack_workspace_id and notification_vars.slack_channel_id_alarms:
+            chatbot_iam_role = iam.Role(
+                self,
+                id="iam_role_chatbot",
+                assumed_by=iam.ServicePrincipal(service="chatbot.amazonaws.com"),
+                managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name("ReadOnlyAccess")],
+            )
+            chatbot_iam_role.add_to_policy(
+                iam.PolicyStatement(
+                    actions=[
+                        "iam:*",
+                        "s3:GetBucketPolicy",
+                        "ssm:*",
+                        "sts:*",
+                        "kms:*",
+                        "cognito-idp:GetSigningCertificate",
+                        "ec2:GetPasswordData",
+                        "ecr:GetAuthorizationToken",
+                        "gamelift:RequestUploadCredentials",
+                        "gamelift:GetInstanceAccess",
+                        "lightsail:DownloadDefaultKeyPair",
+                        "lightsail:GetInstanceAccessDetails",
+                        "lightsail:GetKeyPair",
+                        "lightsail:GetKeyPairs",
+                        "redshift:GetClusterCredentials",
+                        "storagegateway:DescribeChapCredentials",
+                    ],
+                    effect=iam.Effect.DENY,
+                    resources=["*"],
+                )
+            )
+            chatbot_iam_role.add_to_policy(
+                iam.PolicyStatement(
+                    actions=["cloudwatch:Describe*", "cloudwatch:Get*", "cloudwatch:List*"], resources=["*"]
+                )
+            )
+
             channel_configuration = chatbot.SlackChannelConfiguration(
                 self,
                 "chatbot",
@@ -69,6 +108,9 @@ class NotificationsStack(cdk.Stack):
                 notification_topics=[sns_topic],
                 slack_workspace_id=notification_vars.slack_workspace_id,
                 slack_channel_id=notification_vars.slack_channel_id_alarms,
+                log_retention=logs.RetentionDays.ONE_DAY,
+                logging_level=chatbot.LoggingLevel.ERROR,
+                role=chatbot_iam_role,
             )
             channel_configuration.add_to_role_policy(
                 iam.PolicyStatement(
@@ -92,7 +134,11 @@ class NotificationsStack(cdk.Stack):
                 "reason": "Notifications stack, doesn't require encryption",
             },
             {
+                "id": "AwsSolutions-IAM4",
+                "reason": "Wildcard permissions are used in Deny section",
+            },
+            {
                 "id": "AwsSolutions-IAM5",
-                "reason": "ChatBot required actions for CloudWatch",
+                "reason": "Wildcard permissions are used in Deny section",
             },
         ]

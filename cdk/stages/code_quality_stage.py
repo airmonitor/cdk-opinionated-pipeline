@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The CI/CD stage - implements jobs to validate code quality.
 """
 import aws_cdk as cdk
@@ -19,7 +18,8 @@ class CodeQualityStage(cdk.Stage):
 
         :param scope:
         :param construct_id:
-        :param env: Tha AWS CDK Environment class which provides AWS Account ID and AWS Region.
+        :param env: Tha AWS CDK Environment class which provides AWS
+            Account ID and AWS Region.
         :param props:
         :param kwargs:
         """

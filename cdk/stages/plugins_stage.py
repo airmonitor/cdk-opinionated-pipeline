@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The AWS shared resources for core application stage."""
 import aws_cdk as cdk
 from constructs import Construct
@@ -16,7 +15,8 @@ class PluginsStage(cdk.Stage):
 
         :param scope:
         :param construct_id:
-        :param env: The AWS CDK Environment class which provides AWS Account ID and AWS Region.
+        :param env: The AWS CDK Environment class which provides AWS
+            Account ID and AWS Region.
         :param props:
         :param kwargs:
         """

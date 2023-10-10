@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Deploy AWS CodeCommit repository."""
 import aws_cdk as cdk
 import aws_cdk.aws_codecommit as codecommit
@@ -15,10 +14,13 @@ class RepositoryStack(cdk.Stack):
     def __init__(self, scope: Construct, construct_id: str, env: cdk.Environment, props: dict, **kwargs) -> None:
         """Initialize default parameters from AWS CDK and configuration file.
 
-        :param scope: The AWS CDK parent class from which this class inherits
+        :param scope: The AWS CDK parent class from which this class
+            inherits
         :param construct_id: The name of CDK construct
-        :param env: Tha AWS CDK Environment class which provides AWS Account ID and AWS Region
-        :param props: The dictionary which contain configuration values loaded initially from /config/config-env.yaml
+        :param env: Tha AWS CDK Environment class which provides AWS
+            Account ID and AWS Region
+        :param props: The dictionary which contain configuration values
+            loaded initially from /config/config-env.yaml
         :param kwargs:
         """
         super().__init__(scope, construct_id, env=env, **kwargs)

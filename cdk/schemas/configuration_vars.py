@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 """Validate variables against pydantic models."""
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, constr, PositiveFloat, EmailStr
 
@@ -15,8 +14,8 @@ class Observability(BaseModel):
 class PipelinePluginsVars(BaseModel):
     """Pipeline plugins variables."""
 
-    pipeline_trigger: Optional[bool] = None
-    pipeline_trigger_ssm_parameters: Optional[list] = None
+    pipeline_trigger: bool | None = None
+    pipeline_trigger_ssm_parameters: list | None = None
 
 
 class PipelineVars(BaseModel):
@@ -27,7 +26,7 @@ class PipelineVars(BaseModel):
     project: str
     repository: constr(min_length=3, max_length=255)  # type: ignore
     ci_cd_notification_email: EmailStr
-    slack_ci_cd_channel_id: Optional[constr(min_length=0, max_length=11)] = None  # type: ignore
+    slack_ci_cd_channel_id: constr(min_length=0, max_length=11) | None = None  # type: ignore
 
     plugins: PipelinePluginsVars
 
@@ -42,6 +41,6 @@ class ConfigurationVars(PipelineVars):
 class NotificationVars(BaseModel):
     """Notification details, including email, slack, etc."""
 
-    slack_channel_id_alarms: Optional[constr(min_length=0, max_length=11)] = None  # type: ignore
-    slack_channel_id: Optional[constr(min_length=0, max_length=11)] = None  # type: ignore
+    slack_channel_id_alarms: constr(min_length=0, max_length=11) | None = None  # type: ignore
+    slack_channel_id: constr(min_length=0, max_length=11) | None = None  # type: ignore
     slack_workspace_id: constr(min_length=0, max_length=11)  # type: ignore

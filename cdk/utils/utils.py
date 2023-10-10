@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 """Helper functions to make your life simple."""
 
 from os import path
-from typing import Dict, Union, Callable
+from collections.abc import Callable
 
 import aws_cdk as cdk
 
@@ -17,7 +16,7 @@ def check_ansible_dir(directory: str) -> bool:
     return path.isdir(ansible_path)
 
 
-def apply_tags(props: Dict, resource: Union[cdk.Stack, cdk.Stage]) -> Callable:
+def apply_tags(props: dict, resource: cdk.Stack | cdk.Stage) -> Callable:
     """Add standardized tags to every resource created in stack.
 
     :param props: Contain standardized tags (key value) for TR

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Main script for AWS CDK framework which deploy the AWS CI/CD pipeline
 stack."""
 import aws_cdk as cdk

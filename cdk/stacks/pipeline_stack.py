@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 """Deploy AWS CI/CD stack with all stages."""
 from os import path, walk
-from typing import Dict
 
 import aws_cdk as cdk
 import aws_cdk.aws_chatbot as chatbot
@@ -30,10 +28,13 @@ class PipelineStack(cdk.Stack):
     def __init__(self, scope: Construct, construct_id: str, env: cdk.Environment, props: dict, **kwargs) -> None:
         """Initialize default parameters from AWS CDK and configuration file.
 
-        :param scope: The AWS CDK parent class from which this class inherits
+        :param scope: The AWS CDK parent class from which this class
+            inherits
         :param construct_id: The name of CDK construct
-        :param env: Tha AWS CDK Environment class which provides AWS Account ID and AWS Region
-        :param props: The dictionary which contain configuration values loaded initially from /config/config-env.yaml
+        :param env: Tha AWS CDK Environment class which provides AWS
+            Account ID and AWS Region
+        :param props: The dictionary which contain configuration values
+            loaded initially from /config/config-env.yaml
         :param kwargs:
         """
         super().__init__(scope, construct_id, env=env, **kwargs)
@@ -55,7 +56,7 @@ class PipelineStack(cdk.Stack):
                 ],
                 build_environment=codebuild.BuildEnvironment(
                     compute_type=codebuild.ComputeType.SMALL,
-                    build_image=codebuild.LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0,  # type: ignore
+                    build_image=codebuild.LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0,
                 ),
             ),
             synth=pipelines.ShellStep(
@@ -105,8 +106,10 @@ class PipelineStack(cdk.Stack):
         """Create pipeline notifications through email and Slack channel.
 
         :param notification_vars:
-        :param notifications_sns_topic: CDK object for an SNS topic to which notifications will be sent
-        :param pipeline_vars: Pydantic model that contains configuration values loaded initially from config files
+        :param notifications_sns_topic: CDK object for an SNS topic to
+            which notifications will be sent
+        :param pipeline_vars: Pydantic model that contains configuration
+            values loaded initially from config files
         :return:
         """
         # Enable SNS notifications if the recipient email address was provided
@@ -124,7 +127,7 @@ class PipelineStack(cdk.Stack):
                 slack_channel_id=notification_vars.slack_channel_id,
             )
 
-    def pipeline_trigger(self, pipeline_vars: PipelineVars, props: Dict, schedule: events.Schedule):
+    def pipeline_trigger(self, pipeline_vars: PipelineVars, props: dict, schedule: events.Schedule):
         """
 
         :param schedule: The events schedule object
@@ -141,7 +144,7 @@ class PipelineStack(cdk.Stack):
             schedule=schedule,
         )
         trigger.add_target(events_targets.CodePipeline(self.codepipeline.pipeline))
-        apply_tags(props=props, resource=trigger)  # type: ignore
+        apply_tags(props=props, resource=trigger)
 
     def code_quality_stage(
         self,
@@ -223,16 +226,18 @@ class PipelineStack(cdk.Stack):
         env: cdk.Environment,
         stage: str,
         pipeline: pipelines.CodePipeline,
-        props: Dict,
+        props: dict,
         pipeline_vars: PipelineVars,
     ) -> None:
         """Create core shared resources stage.
 
         :param stage: The type of environment, example prod, ppe, dr
-        :param env: The AWS CDK Environment class which provides AWS Account ID and AWS Region
+        :param env: The AWS CDK Environment class which provides AWS
+            Account ID and AWS Region
         :param pipeline: The AWS CDK pipelines CdkPipeline object
         :param props: The dictionary loaded from config directory
-        :param pipeline_vars: Pydantic model that contains configuration values loaded initially from config files
+        :param pipeline_vars: Pydantic model that contains configuration
+            values loaded initially from config files
         :return: None
         """
         stage = SharedResourcesStage(
@@ -247,7 +252,8 @@ class PipelineStack(cdk.Stack):
     def notifications_topic(self, pipeline_vars: PipelineVars) -> sns.Topic:
         """Create an SNS topic used in CI/CD notifications.
 
-        :param pipeline_vars: Pydantic model that contains configuration values loaded initially from config files
+        :param pipeline_vars: Pydantic model that contains configuration
+            values loaded initially from config files
         :return sns.Topic: The AWS SNS Topic instance
         """
         notifications_sns_topic = sns.Topic(self, "notifications_topic", display_name="CodePipeline notifications")
@@ -318,7 +324,7 @@ class PipelineStack(cdk.Stack):
             targets=[sns_topic],
         )
 
-    def environment_type(self, env: cdk.Environment, stage: str, props: Dict):
+    def environment_type(self, env: cdk.Environment, stage: str, props: dict):
         """Create environment using a dedicated AWS account, including a
         different AWS region.
 
@@ -326,7 +332,7 @@ class PipelineStack(cdk.Stack):
         :param env: The AWS CDK environment object.
         :param props: The dictionary loaded from config directory.
         """
-        props_env: Dict[list, Dict] = {}
+        props_env: dict[list, dict] = {}
 
         # pylint: disable=W0612
         for dir_path, dir_names, files in walk(f"cdk/config/{stage}", topdown=False):
@@ -347,16 +353,18 @@ class PipelineStack(cdk.Stack):
         env: cdk.Environment,
         stage: str,
         pipeline: pipelines.CodePipeline,
-        props: Dict,
+        props: dict,
         pipeline_vars: PipelineVars,
     ) -> None:
         """Create Bots stage.
 
         :param stage: The type of environment, example prod, ppe, dr
-        :param env: The AWS CDK Environment class which provides AWS Account ID and AWS Region
+        :param env: The AWS CDK Environment class which provides AWS
+            Account ID and AWS Region
         :param pipeline: The AWS CDK pipelines CdkPipeline object
         :param props: The dictionary loaded from config directory
-        :param pipeline_vars: Pydantic model that contains configuration values loaded initially from config files
+        :param pipeline_vars: Pydantic model that contains configuration
+            values loaded initially from config files
         :return: None
         """
 

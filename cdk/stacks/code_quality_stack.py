@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """The pre-prerequisites stack which create resource which needs to exist
 before core stack will be created.
 
 Example is SSM parameter store entry ci/cd configuration values
 """
 from os import path, walk
-from typing import Dict, List
 
 import aws_cdk as cdk
 import aws_cdk.aws_ssm as ssm
@@ -28,7 +26,7 @@ class CodeQualityStack(cdk.Stack):
 
     def __init__(self, scope: Construct, construct_id: str, env, props, **kwargs) -> None:
         super().__init__(scope, construct_id, env=env, **kwargs)
-        props_env: Dict[List, Dict] = {}
+        props_env: dict[list, dict] = {}
         config_vars = ConfigurationVars(**props)
         # pylint: disable=W0612
         for dir_path, dir_names, files in walk(f"cdk/config/{config_vars.stage}", topdown=False):

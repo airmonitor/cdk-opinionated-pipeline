@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CDK constructs for opinionated S3 bucket, SNS topic, SQS Queue."""
 
 import aws_cdk.aws_sns as sns

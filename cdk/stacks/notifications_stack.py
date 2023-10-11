@@ -9,7 +9,7 @@ import aws_cdk.aws_logs as logs
 import aws_cdk.aws_sns_subscriptions as sns_subscriptions
 import aws_cdk.aws_ssm as ssm
 from aws_cdk import Aspects
-from cdk_nag import AwsSolutionsChecks, NagSuppressions
+from cdk_nag import AwsSolutionsChecks, NagSuppressions, NagPackSuppression
 from cdk_opinionated_constructs.sns import SNSTopic
 from constructs import Construct
 
@@ -124,16 +124,7 @@ class NotificationsStack(cdk.Stack):
         :return:
         """
         return [
-            {
-                "id": "AwsSolutions-SNS2",
-                "reason": "Notifications stack, doesn't require encryption",
-            },
-            {
-                "id": "AwsSolutions-IAM4",
-                "reason": "Wildcard permissions are used in Deny section",
-            },
-            {
-                "id": "AwsSolutions-IAM5",
-                "reason": "Wildcard permissions are used in Deny section",
-            },
+            NagPackSuppression(id="AwsSolutions-SNS2", reason="Notifications stack, doesn't require encryption"),
+            NagPackSuppression(id="AwsSolutions-IAM4", reason="Wildcard permissions are used in Deny section"),
+            NagPackSuppression(id="AwsSolutions-IAM5", reason="Wildcard permissions are used in Deny section"),
         ]

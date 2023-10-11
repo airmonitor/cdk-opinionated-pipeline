@@ -101,7 +101,7 @@ class NotificationsStack(cdk.Stack):
                 )
             )
 
-            channel_configuration = chatbot.SlackChannelConfiguration(
+            chatbot.SlackChannelConfiguration(
                 self,
                 "chatbot",
                 slack_channel_configuration_name=f"{config_vars.stage}-{config_vars.project}",
@@ -111,11 +111,6 @@ class NotificationsStack(cdk.Stack):
                 log_retention=logs.RetentionDays.ONE_DAY,
                 logging_level=chatbot.LoggingLevel.ERROR,
                 role=chatbot_iam_role,
-            )
-            channel_configuration.add_to_role_policy(
-                iam.PolicyStatement(
-                    actions=["cloudwatch:Describe*", "cloudwatch:Get*", "cloudwatch:List*"], resources=["*"]
-                )
             )
 
         # Validate stack against AWS Solutions checklist

@@ -1,3 +1,4 @@
-stage: "DEV"
+stage: "dev"
 tags:
-  environment-type: "DEV"
+  environment-type: "dev"
+slack_channel_id_alarms: "" # Alarms

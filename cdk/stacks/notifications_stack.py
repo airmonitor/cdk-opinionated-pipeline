@@ -2,6 +2,8 @@
 
 Example sns alarm topic
 """
+import yaml
+from os import path, walk
 import aws_cdk as cdk
 import aws_cdk.aws_chatbot as chatbot
 import aws_cdk.aws_iam as iam
@@ -36,6 +38,15 @@ class NotificationsStack(cdk.Stack):
         """
         super().__init__(scope, construct_id, env=env, **kwargs)
         config_vars = ConfigurationVars(**props)
+
+        # pylint: disable=W0612
+        props_env: dict[list, dict] = {}
+        for dir_path, dir_names, files in walk(f"cdk/config/{config_vars.stage}", topdown=False):
+            for file_name in files:
+                with open(path.join(dir_path, file_name), encoding="utf-8") as f:
+                    props_env |= yaml.safe_load(f)
+                    props["slack_channel_id_alarms"] = props_env["slack_channel_id_alarms"]  # type: ignore
+
         notification_vars = NotificationVars(**props)
 
         sns_construct = SNSTopic(self, id="topic_construct")

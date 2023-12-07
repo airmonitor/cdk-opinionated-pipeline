@@ -45,7 +45,7 @@ class NotificationsStack(cdk.Stack):
             for file_name in files:
                 with open(path.join(dir_path, file_name), encoding="utf-8") as f:
                     props_env |= yaml.safe_load(f)
-                    props["slack_channel_id_alarms"] = props_env["slack_channel_id_alarms"]  # type: ignore
+        props["slack_channel_id_alarms"] = props_env["slack_channel_id_alarms"]  # type: ignore
 
         notifications_vars = NotificationVars(**props)
 

@@ -2,6 +2,8 @@
 
 Example sns alarm topic
 """
+import yaml
+from os import path, walk
 import aws_cdk as cdk
 import aws_cdk.aws_chatbot as chatbot
 import aws_cdk.aws_iam as iam
@@ -36,7 +38,16 @@ class NotificationsStack(cdk.Stack):
         """
         super().__init__(scope, construct_id, env=env, **kwargs)
         config_vars = ConfigurationVars(**props)
-        notification_vars = NotificationVars(**props)
+
+        # pylint: disable=W0612
+        props_env: dict[list, dict] = {}
+        for dir_path, dir_names, files in walk(f"cdk/config/{config_vars.stage}", topdown=False):
+            for file_name in files:
+                with open(path.join(dir_path, file_name), encoding="utf-8") as f:
+                    props_env |= yaml.safe_load(f)
+                    props["slack_channel_id_alarms"] = props_env["slack_channel_id_alarms"]  # type: ignore
+
+        notifications_vars = NotificationVars(**props)
 
         sns_construct = SNSTopic(self, id="topic_construct")
         sns_topic = sns_construct.create_sns_topic(
@@ -65,7 +76,7 @@ class NotificationsStack(cdk.Stack):
             topic_subscription=sns_subscriptions.EmailSubscription(email_address=props["ci_cd_notification_email"])
         )
 
-        if notification_vars.slack_workspace_id and notification_vars.slack_channel_id_alarms:
+        if notifications_vars.slack_workspace_id and notifications_vars.slack_channel_id_alarms:
             chatbot_iam_role = iam.Role(
                 self,
                 id="iam_role_chatbot",
@@ -107,8 +118,8 @@ class NotificationsStack(cdk.Stack):
                 "chatbot",
                 slack_channel_configuration_name=f"{config_vars.stage}-{config_vars.project}",
                 notification_topics=[sns_topic],
-                slack_workspace_id=notification_vars.slack_workspace_id,
-                slack_channel_id=notification_vars.slack_channel_id_alarms,
+                slack_workspace_id=notifications_vars.slack_workspace_id,
+                slack_channel_id=notifications_vars.slack_channel_id_alarms,
                 log_retention=logs.RetentionDays.ONE_DAY,
                 logging_level=chatbot.LoggingLevel.ERROR,
                 role=chatbot_iam_role,

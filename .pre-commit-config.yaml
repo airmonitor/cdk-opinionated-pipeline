@@ -40,7 +40,7 @@ repos:
     rev: "v1.7.1"
     hooks:
       - id: mypy
-        args: [--explicit-package-bases, --namespace-packages, --ignore-missing-imports, --warn-unused-ignores]
+        args: [--explicit-package-bases, --namespace-packages, --ignore-missing-imports]
         additional_dependencies:
           - "types-PyYAML"
           - "pydantic>=2.4.0"

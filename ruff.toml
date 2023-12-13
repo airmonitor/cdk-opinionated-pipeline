@@ -7,3 +7,8 @@ max-complexity = 5
 combine-as-imports = true
 force-sort-within-sections = true
 lines-between-types = 1
+
+[lint]
+extend-select = [
+  "UP",  # pyupgrade
+]

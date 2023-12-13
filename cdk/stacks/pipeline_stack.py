@@ -17,6 +17,7 @@ from constructs import Construct
 
 from cdk.schemas.configuration_vars import PipelineVars, NotificationVars
 from cdk.stages.code_quality_stage import CodeQualityStage
+from cdk.stages.infrastructure_tests_stage import InfrastructureTestsStage
 from cdk.stages.plugins_stage import PluginsStage
 from cdk.stages.shared_resources_stage import SharedResourcesStage
 from cdk.utils.utils import check_ansible_dir, apply_tags
@@ -77,13 +78,18 @@ class PipelineStack(cdk.Stack):
         )
 
         # DEV resources
+        stage = "dev"
+        env = cdk.Environment(
+            account=pipeline_vars.aws_account,
+            region=pipeline_vars.aws_region,
+        )
+        self.infrastructure_test_stage(
+            env=env, pipeline=self.codepipeline, props=props, pipeline_vars=pipeline_vars, stage=stage
+        )
         self.environment_type(
             props=props,
-            env=cdk.Environment(
-                account=pipeline_vars.aws_account,
-                region=pipeline_vars.aws_region,
-            ),
-            stage="dev",
+            env=env,
+            stage=stage,
         )
 
         self.codepipeline.build_pipeline()
@@ -195,18 +201,6 @@ class PipelineStack(cdk.Stack):
             ],
         )
 
-        test_notifications_stack = pipelines.ShellStep(
-            "test_notifications_stack",
-            commands=[
-                "python3 -m pip install --upgrade pip",
-                "pip install -r requirements.txt",
-                "npm install -g aws-cdk",
-                "pip install -r cdk/stacks/requirements.txt",
-                "pip install pytest",
-                f"STAGE={props['stage']} pytest -v cdk/tests/infrastructure/test_notifications_stack.py",
-            ],
-        )
-
         ansible_lint = pipelines.ShellStep(
             "ansible-lint",
             commands=[
@@ -215,9 +209,54 @@ class PipelineStack(cdk.Stack):
             ],
         )
 
-        pre_jobs = [pre_commit, test_notifications_stack]
+        pre_jobs = [pre_commit]
         if check_ansible_dir(directory="../ansible"):
             pre_jobs.append(ansible_lint)
+
+        pipeline.add_stage(stage=stage, pre=pre_jobs)
+
+    def infrastructure_test_stage(
+        self,
+        env: cdk.Environment,
+        pipeline: pipelines.CodePipeline,
+        props: dict,
+        stage: str,
+        pipeline_vars: PipelineVars,
+    ) -> None:
+        """Create CI/CD stage which contains several jobs for various tests.
+
+        :param pipeline_vars: Pydantic model that contains configuration values loaded initially from config files
+        :param env: The AWS CDK Environment class which provides AWS Account ID and AWS Region
+        :param pipeline: The AWS CDK pipelines CdkPipeline object
+        :param props: The dictionary loaded from config directory.
+        :param stage: The stage at which deploy - example: dr, prod, ppe
+
+        :return: None
+        """
+        props["stage"] = stage
+        stage = InfrastructureTestsStage(
+            self,
+            construct_id=f"{stage}-{pipeline_vars.project}-infrastructure-tests-stage",
+            env=env,
+            props=props,
+        )
+        apply_tags(props=props, resource=stage)
+
+        unit_test_stacks = pipelines.ShellStep(
+            "unit_test_stacks",
+            commands=[
+                "python3 -m pip install --upgrade pip",
+                "pip install -r requirements.txt",
+                "npm install -g aws-cdk",
+                "pip install -r cdk/stacks/requirements.txt",
+                "pip install pytest",
+                f"STAGE={props['stage']} pytest -v cdk/tests/unit/",
+            ],
+        )
+
+        pre_jobs = [
+            unit_test_stacks,
+        ]
 
         pipeline.add_stage(stage=stage, pre=pre_jobs)
 
@@ -312,8 +351,6 @@ class PipelineStack(cdk.Stack):
             "codepipeline_notifications",
             detail_type=DetailType.FULL,
             events=[
-                "codepipeline-pipeline-pipeline-execution-started",
-                "codepipeline-pipeline-pipeline-execution-succeeded",
                 "codepipeline-pipeline-pipeline-execution-failed",
                 "codepipeline-pipeline-action-execution-failed",
                 "codepipeline-pipeline-stage-execution-failed",

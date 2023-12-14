@@ -1,13 +1,13 @@
 """Helper functions to make your life simple."""
 
 from os import path
-from collections.abc import Callable
 
 import aws_cdk as cdk
+from aws_cdk import Stack, Stage
 
 
 def check_ansible_dir(directory: str) -> bool:
-    """Check if ansible directory exist in root path.
+    """Check if ansible directory exists in a root path.
 
     :return: Bool - True if ansible directory exist, false if not
     """
@@ -16,7 +16,7 @@ def check_ansible_dir(directory: str) -> bool:
     return path.isdir(ansible_path)
 
 
-def apply_tags(props: dict, resource: cdk.Stack | cdk.Stage) -> Callable:
+def apply_tags(props: dict, resource: cdk.Stack | cdk.Stage) -> Stack | Stage:
     """Add standardized tags to every resource created in stack.
 
     :param props: Contain standardized tags (key value) for TR

@@ -39,7 +39,7 @@ class CodeQualityStack(cdk.Stack):
             self,
             id="config_file",
             string_value=str(props_env),
-            parameter_name=f"/{config_vars.stage}/{config_vars.project}/config",
+            parameter_name=f"/{config_vars.project}/{config_vars.stage}/config",
         )
 
         Aspects.of(self).add(AwsSolutionsChecks(log_ignores=True))

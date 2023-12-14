@@ -51,7 +51,7 @@ class NotificationsStack(cdk.Stack):
 
         sns_construct = SNSTopic(self, id="topic_construct")
         sns_topic = sns_construct.create_sns_topic(
-            topic_name=f"{config_vars.stage}-{config_vars.project}-alarms", master_key=None
+            topic_name=f"{config_vars.project}-{config_vars.stage}-alarms", master_key=None
         )
 
         # grant cloudwatch permissions to publish to the topic
@@ -69,7 +69,7 @@ class NotificationsStack(cdk.Stack):
             self,
             id="sns_topic_ssm_param",
             string_value=sns_topic.topic_arn,
-            parameter_name=f"/{config_vars.stage}/{config_vars.project}/topic/alarm/arn",
+            parameter_name=f"/{config_vars.project}/{config_vars.stage}/topic/alarm/arn",
         )
 
         sns_topic.add_subscription(
@@ -116,8 +116,8 @@ class NotificationsStack(cdk.Stack):
             chatbot.SlackChannelConfiguration(
                 self,
                 "chatbot",
-                slack_channel_configuration_name=f"{config_vars.stage}-{config_vars.project}",
-                notification_topics=[sns_topic],
+                slack_channel_configuration_name=f"{config_vars.project}-{config_vars.stage}",
+                notification_topics=[sns_topic],  # type: ignore
                 slack_workspace_id=notifications_vars.slack_workspace_id,
                 slack_channel_id=notifications_vars.slack_channel_id_alarms,
                 log_retention=logs.RetentionDays.ONE_DAY,

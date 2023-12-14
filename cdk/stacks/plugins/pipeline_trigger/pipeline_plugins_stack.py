@@ -42,7 +42,7 @@ class PipelinePluginsStack(cdk.Stack):
             self,
             id="pipeline_plugins",
             string_value=str(pipeline_vars.plugins),
-            parameter_name=f"/{config_vars.stage}/{config_vars.project}/pipeline_plugins",
+            parameter_name=f"/{config_vars.project}/{config_vars.stage}/pipeline_plugins",
         )
 
         Aspects.of(self).add(AwsSolutionsChecks(log_ignores=True))

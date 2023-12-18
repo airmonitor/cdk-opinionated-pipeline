@@ -1,7 +1,7 @@
 """Validate variables against pydantic models."""
 from typing import Literal
 
-from pydantic import BaseModel, constr, PositiveFloat, EmailStr
+from pydantic import BaseModel, EmailStr, PositiveFloat, constr
 
 
 class Observability(BaseModel):

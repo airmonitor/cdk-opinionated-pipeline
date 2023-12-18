@@ -4,14 +4,16 @@ before core stack will be created.
 Example is SSM parameter store entry ci/cd configuration values
 """
 from os import path, walk
-import yaml
+
 import aws_cdk as cdk
 import aws_cdk.aws_ssm as ssm
-from constructs import Construct
-from cdk.schemas.configuration_vars import ConfigurationVars
+import yaml
 
 from aws_cdk import Aspects
 from cdk_nag import AwsSolutionsChecks
+from constructs import Construct
+
+from cdk.schemas.configuration_vars import ConfigurationVars
 
 
 class InfrastructureTestsStack(cdk.Stack):
@@ -28,7 +30,7 @@ class InfrastructureTestsStack(cdk.Stack):
         props_env: dict[list, dict] = {}
 
         # pylint: disable=W0612
-        for dir_path, dir_names, files in walk(f"cdk/config/{props['stage']}", topdown=False):
+        for dir_path, dir_names, files in walk(f"cdk/config/{props['stage']}", topdown=False):  # noqa
             for file_name in files:
                 with open(path.join(dir_path, file_name), encoding="utf-8") as f:
                     props_env |= yaml.safe_load(f)

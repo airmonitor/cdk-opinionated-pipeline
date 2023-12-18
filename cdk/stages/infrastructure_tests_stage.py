@@ -1,6 +1,7 @@
 """The CI/CD stage - implements jobs to validate code quality.
 """
 import aws_cdk as cdk
+
 from constructs import Construct
 
 from cdk.stacks.infrastructure_tests_stack import InfrastructureTestsStack

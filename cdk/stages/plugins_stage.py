@@ -1,5 +1,6 @@
 """The AWS shared resources for core application stage."""
 import aws_cdk as cdk
+
 from constructs import Construct
 
 from cdk.schemas.configuration_vars import PipelineVars

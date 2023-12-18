@@ -2,16 +2,18 @@
 
 Example sns alarm topic
 """
-import yaml
 from os import path, walk
+
 import aws_cdk as cdk
 import aws_cdk.aws_chatbot as chatbot
 import aws_cdk.aws_iam as iam
 import aws_cdk.aws_logs as logs
 import aws_cdk.aws_sns_subscriptions as sns_subscriptions
 import aws_cdk.aws_ssm as ssm
+import yaml
+
 from aws_cdk import Aspects
-from cdk_nag import AwsSolutionsChecks, NagSuppressions, NagPackSuppression
+from cdk_nag import AwsSolutionsChecks, NagPackSuppression, NagSuppressions
 from cdk_opinionated_constructs.sns import SNSTopic
 from constructs import Construct
 
@@ -41,7 +43,7 @@ class NotificationsStack(cdk.Stack):
 
         # pylint: disable=W0612
         props_env: dict[list, dict] = {}
-        for dir_path, dir_names, files in walk(f"cdk/config/{config_vars.stage}", topdown=False):
+        for dir_path, dir_names, files in walk(f"cdk/config/{config_vars.stage}", topdown=False):  # noqa
             for file_name in files:
                 with open(path.join(dir_path, file_name), encoding="utf-8") as f:
                     props_env |= yaml.safe_load(f)

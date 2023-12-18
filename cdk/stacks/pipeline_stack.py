@@ -11,16 +11,17 @@ import aws_cdk.aws_iam as iam
 import aws_cdk.aws_sns as sns
 import aws_cdk.aws_sns_subscriptions as sns_subscriptions
 import yaml
+
 from aws_cdk import pipelines
 from aws_cdk.aws_codestarnotifications import DetailType, NotificationRule
 from constructs import Construct
 
-from cdk.schemas.configuration_vars import PipelineVars, NotificationVars
+from cdk.schemas.configuration_vars import NotificationVars, PipelineVars
 from cdk.stages.code_quality_stage import CodeQualityStage
 from cdk.stages.infrastructure_tests_stage import InfrastructureTestsStage
 from cdk.stages.plugins_stage import PluginsStage
 from cdk.stages.shared_resources_stage import SharedResourcesStage
-from cdk.utils.utils import check_ansible_dir, apply_tags
+from cdk.utils.utils import apply_tags, check_ansible_dir
 
 
 class PipelineStack(cdk.Stack):
@@ -372,7 +373,7 @@ class PipelineStack(cdk.Stack):
         props_env: dict[list, dict] = {}
 
         # pylint: disable=W0612
-        for dir_path, dir_names, files in walk(f"cdk/config/{stage}", topdown=False):
+        for dir_path, dir_names, files in walk(f"cdk/config/{stage}", topdown=False):  # noqa
             for file_name in files:
                 with open(path.join(dir_path, file_name), encoding="utf-8") as f:
                     props_env |= yaml.safe_load(f)

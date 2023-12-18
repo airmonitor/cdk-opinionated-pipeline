@@ -1,6 +1,7 @@
 """Deploy AWS CodeCommit repository."""
 import aws_cdk as cdk
 import aws_cdk.aws_codecommit as codecommit
+
 from aws_cdk import Aspects
 from cdk_nag import AwsSolutionsChecks
 from constructs import Construct

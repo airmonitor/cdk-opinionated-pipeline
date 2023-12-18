@@ -43,8 +43,9 @@ repos:
         args: [--explicit-package-bases, --namespace-packages, --ignore-missing-imports]
         additional_dependencies:
           - "types-PyYAML"
-          - "pydantic>=2.4.0"
+          - "pydantic>=2.5.2"
           - "types-retry"
+          - "types-requests"
   - repo: https://github.com/myint/docformatter
     rev: "v1.7.5"
     hooks:

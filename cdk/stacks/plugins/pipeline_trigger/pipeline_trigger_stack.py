@@ -5,6 +5,7 @@ import aws_cdk.aws_codepipeline as pipeline
 import aws_cdk.aws_events as events
 import aws_cdk.aws_events_targets as events_targets
 import aws_cdk.aws_iam as iam
+
 from constructs import Construct
 
 from cdk.schemas.configuration_vars import ConfigurationVars, PipelineVars

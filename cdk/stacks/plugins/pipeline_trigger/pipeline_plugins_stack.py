@@ -8,6 +8,7 @@ from os import path, walk
 import aws_cdk as cdk
 import aws_cdk.aws_ssm as ssm
 import yaml
+
 from aws_cdk import Aspects
 from cdk_nag import AwsSolutionsChecks
 from constructs import Construct
@@ -29,7 +30,7 @@ class PipelinePluginsStack(cdk.Stack):
         props_env: dict[list, dict] = {}
 
         # pylint: disable=W0612
-        for dir_path, dir_names, files in walk(f"cdk/config/{props['stage']}", topdown=False):
+        for dir_path, dir_names, files in walk(f"cdk/config/{props['stage']}", topdown=False):  # noqa
             for file_name in files:
                 with open(path.join(dir_path, file_name), encoding="utf-8") as f:
                     props_env |= yaml.safe_load(f)

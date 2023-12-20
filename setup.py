@@ -1,8 +1,10 @@
-# -*- coding: utf-8 -*-
 """CDK Setup file."""
+from pathlib import Path
+
 import setuptools
 
-with open("README.md", encoding="utf-8") as f:
+readme = Path("README.md")
+with readme.open(encoding="utf-8") as f:
     long_description = f.read()
 
 setuptools.setup(

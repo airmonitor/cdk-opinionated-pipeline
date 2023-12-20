@@ -3,7 +3,8 @@ before core stack will be created.
 
 Example is SSM parameter store entry ci/cd configuration values
 """
-from os import path, walk
+from os import walk
+from pathlib import Path
 
 import aws_cdk as cdk
 import aws_cdk.aws_ssm as ssm
@@ -32,7 +33,8 @@ class PipelinePluginsStack(cdk.Stack):
         # pylint: disable=W0612
         for dir_path, dir_names, files in walk(f"cdk/config/{props['stage']}", topdown=False):  # noqa
             for file_name in files:
-                with open(path.join(dir_path, file_name), encoding="utf-8") as f:
+                file_path = Path(f"{dir_path}/{file_name}")
+                with file_path.open(encoding="utf-8") as f:
                     props_env |= yaml.safe_load(f)
                     props = {**props_env, **props}
 

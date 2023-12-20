@@ -2,7 +2,8 @@
 
 Example sns alarm topic
 """
-from os import path, walk
+from os import walk
+from pathlib import Path
 
 import aws_cdk as cdk
 import aws_cdk.aws_chatbot as chatbot
@@ -45,7 +46,8 @@ class NotificationsStack(cdk.Stack):
         props_env: dict[list, dict] = {}
         for dir_path, dir_names, files in walk(f"cdk/config/{config_vars.stage}", topdown=False):  # noqa
             for file_name in files:
-                with open(path.join(dir_path, file_name), encoding="utf-8") as f:
+                file_path = Path(f"{dir_path}/{file_name}")
+                with file_path.open(encoding="utf-8") as f:
                     props_env |= yaml.safe_load(f)
         props["slack_channel_id_alarms"] = props_env["slack_channel_id_alarms"]  # type: ignore
 
@@ -53,7 +55,8 @@ class NotificationsStack(cdk.Stack):
 
         sns_construct = SNSTopic(self, id="topic_construct")
         sns_topic = sns_construct.create_sns_topic(
-            topic_name=f"{config_vars.project}-{config_vars.stage}-alarms", master_key=None
+            topic_name=f"{config_vars.project}-{config_vars.stage}-alarms",
+            master_key=None,
         )
 
         # grant cloudwatch permissions to publish to the topic
@@ -64,7 +67,7 @@ class NotificationsStack(cdk.Stack):
                 resources=[sns_topic.topic_arn],
                 principals=[iam.ServicePrincipal("cloudwatch.amazonaws.com")],
                 effect=iam.Effect.ALLOW,
-            )
+            ),
         )
 
         ssm.StringParameter(
@@ -75,7 +78,7 @@ class NotificationsStack(cdk.Stack):
         )
 
         sns_topic.add_subscription(
-            topic_subscription=sns_subscriptions.EmailSubscription(email_address=props["ci_cd_notification_email"])
+            topic_subscription=sns_subscriptions.EmailSubscription(email_address=props["ci_cd_notification_email"]),
         )
 
         if notifications_vars.slack_workspace_id and notifications_vars.slack_channel_id_alarms:
@@ -107,12 +110,13 @@ class NotificationsStack(cdk.Stack):
                     ],
                     effect=iam.Effect.DENY,
                     resources=["*"],
-                )
+                ),
             )
             chatbot_iam_role.add_to_policy(
                 iam.PolicyStatement(
-                    actions=["cloudwatch:Describe*", "cloudwatch:Get*", "cloudwatch:List*"], resources=["*"]
-                )
+                    actions=["cloudwatch:Describe*", "cloudwatch:Get*", "cloudwatch:List*"],
+                    resources=["*"],
+                ),
             )
 
             chatbot.SlackChannelConfiguration(

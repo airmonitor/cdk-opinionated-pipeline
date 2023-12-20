@@ -41,6 +41,6 @@ class ImportedCoreResources(Construct):
                 topic_arn=topic_arn,
             )
             for index, topic_arn in enumerate(
-                self.pipeline_vars.plugins.pipeline_trigger_upstream_sns_topics  # type: ignore
+                self.pipeline_vars.plugins.pipeline_trigger_upstream_sns_topics,  # type: ignore
             )
         ]

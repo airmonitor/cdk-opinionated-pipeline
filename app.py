@@ -1,5 +1,7 @@
-"""Main script for AWS CDK framework which deploy the AWS CI/CD pipeline
+"""Main script for an AWS CDK framework which deploys the AWS CI/CD pipeline
 stack."""
+from pathlib import Path
+
 import aws_cdk as cdk
 import yaml
 
@@ -9,10 +11,8 @@ from cdk.utils.utils import apply_tags
 
 app = cdk.App()
 
-# The first deployment "cdk deploy -c stage=poc1" will mark stage permanent to cdk pipeline for subsequent commits
-
-
-with open("cdk/config/config-ci-cd.yaml", encoding="utf-8") as file:
+config_ci_cd_path = Path("cdk/config/config-ci-cd.yaml")
+with config_ci_cd_path.open(encoding="utf-8") as file:
     PROPS = yaml.safe_load(file)
     pipeline_vars = PipelineVars(**PROPS)
 

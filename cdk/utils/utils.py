@@ -1,6 +1,6 @@
 """Helper functions to make your life simple."""
 
-from os import path
+from pathlib import Path
 
 import aws_cdk as cdk
 
@@ -12,9 +12,9 @@ def check_ansible_dir(directory: str) -> bool:
 
     :return: Bool - True if ansible directory exist, false if not
     """
-    this_dir = path.dirname(__file__)
-    ansible_path = path.abspath(path.join(this_dir, directory))
-    return path.isdir(ansible_path)
+    this_dir = Path(__file__).parent
+    ansible_path = this_dir.joinpath(directory).resolve()
+    return ansible_path.is_dir()
 
 
 def apply_tags(props: dict, resource: cdk.Stack | cdk.Stage) -> Stack | Stage:

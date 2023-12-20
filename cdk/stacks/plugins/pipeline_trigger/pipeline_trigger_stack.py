@@ -37,7 +37,7 @@ class PipelineTriggerStack(cdk.Stack):
 
         # Filter all ssm parameters which have the name of the stage
         filtered_ssm_parameters = list(
-            filter(lambda x: config_vars.stage in x, pipeline_vars.plugins.pipeline_trigger_ssm_parameters)
+            filter(lambda x: config_vars.stage in x, pipeline_vars.plugins.pipeline_trigger_ssm_parameters),
         )
 
         event_pattern = events.EventPattern(
@@ -53,10 +53,10 @@ class PipelineTriggerStack(cdk.Stack):
                     iam.PolicyStatement(
                         actions=["codepipeline:StartPipelineExecution"],
                         resources=[
-                            f"arn:aws:codepipeline:{config_vars.aws_region}:{config_vars.aws_account}:{config_vars.project}"
+                            f"arn:aws:codepipeline:{config_vars.aws_region}:{config_vars.aws_account}:{config_vars.project}",
                         ],
                     ),
-                ]
+                ],
             )
             events_iam_role = iam.Role(
                 self,
@@ -77,6 +77,6 @@ class PipelineTriggerStack(cdk.Stack):
                             id="imported_codepipeline",
                             pipeline_arn=f"arn:aws:codepipeline:{config_vars.aws_region}:{config_vars.aws_account}:{config_vars.project}",
                         ),
-                    )
+                    ),
                 ],
             )

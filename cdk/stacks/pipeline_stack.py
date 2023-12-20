@@ -1,5 +1,6 @@
 """Deploy AWS CI/CD stack with all stages."""
-from os import path, walk
+from os import walk
+from pathlib import Path
 
 import aws_cdk as cdk
 import aws_cdk.aws_chatbot as chatbot
@@ -43,7 +44,9 @@ class PipelineStack(cdk.Stack):
         pipeline_vars = PipelineVars(**props)
         notification_vars = NotificationVars(**props)
         imported_repository = codecommit.Repository.from_repository_name(
-            self, id="imported_repository", repository_name=pipeline_vars.repository
+            self,
+            id="imported_repository",
+            repository_name=pipeline_vars.repository,
         )
 
         notifications_sns_topic = self.notifications_topic(pipeline_vars=pipeline_vars)
@@ -75,7 +78,11 @@ class PipelineStack(cdk.Stack):
         )
 
         self.code_quality_stage(
-            env=env, pipeline=self.codepipeline, props=props, pipeline_vars=pipeline_vars, stage="dev"
+            env=env,
+            pipeline=self.codepipeline,
+            props=props,
+            pipeline_vars=pipeline_vars,
+            stage="dev",
         )
 
         # DEV resources
@@ -85,7 +92,11 @@ class PipelineStack(cdk.Stack):
             region=pipeline_vars.aws_region,
         )
         self.infrastructure_test_stage(
-            env=env, pipeline=self.codepipeline, props=props, pipeline_vars=pipeline_vars, stage=stage
+            env=env,
+            pipeline=self.codepipeline,
+            props=props,
+            pipeline_vars=pipeline_vars,
+            stage=stage,
         )
         self.environment_type(
             props=props,
@@ -108,7 +119,10 @@ class PipelineStack(cdk.Stack):
         )
 
     def create_pipeline_notifications(
-        self, notifications_sns_topic: sns.Topic, notification_vars: NotificationVars, pipeline_vars: PipelineVars
+        self,
+        notifications_sns_topic: sns.Topic,
+        notification_vars: NotificationVars,
+        pipeline_vars: PipelineVars,
     ):
         """Create pipeline notifications through email and Slack channel.
 
@@ -298,7 +312,9 @@ class PipelineStack(cdk.Stack):
         """
         notifications_sns_topic = sns.Topic(self, "notifications_topic", display_name="CodePipeline notifications")
         notifications_sns_topic.add_subscription(
-            topic_subscription=sns_subscriptions.EmailSubscription(email_address=pipeline_vars.ci_cd_notification_email)
+            topic_subscription=sns_subscriptions.EmailSubscription(
+                email_address=pipeline_vars.ci_cd_notification_email,
+            ),
         )
 
         # Warning suppression for cdk_nag
@@ -307,8 +323,8 @@ class PipelineStack(cdk.Stack):
             "cdk_nag",
             {
                 "rules_to_suppress": [
-                    {"id": "AwsSolutions-SNS2", "reason": "Notification topic don't require encryption"}
-                ]
+                    {"id": "AwsSolutions-SNS2", "reason": "Notification topic don't require encryption"},
+                ],
             },
         )
         return notifications_sns_topic
@@ -327,7 +343,7 @@ class PipelineStack(cdk.Stack):
                 principals=[iam.ServicePrincipal(service="codestar-notifications.amazonaws.com")],
                 actions=["SNS:Publish"],
                 resources=[sns_topic.topic_arn],
-            )
+            ),
         )
 
     def pipeline_notifications(self, sns_topic: sns.ITopic) -> None:
@@ -342,7 +358,7 @@ class PipelineStack(cdk.Stack):
                 principals=[iam.ServicePrincipal(service="codestar-notifications.amazonaws.com")],
                 actions=["SNS:Publish"],
                 resources=[sns_topic.topic_arn],
-            )
+            ),
         )
 
         # The CodePipeline notifications available rules:
@@ -375,7 +391,8 @@ class PipelineStack(cdk.Stack):
         # pylint: disable=W0612
         for dir_path, dir_names, files in walk(f"cdk/config/{stage}", topdown=False):  # noqa
             for file_name in files:
-                with open(path.join(dir_path, file_name), encoding="utf-8") as f:
+                file_path = Path(f"{dir_path}/{file_name}")
+                with file_path.open(encoding="utf-8") as f:
                     props_env |= yaml.safe_load(f)
 
         props = {**props_env, **props, "stage": stage}
@@ -383,7 +400,11 @@ class PipelineStack(cdk.Stack):
 
         self.plugins_stage(env=env, pipeline=self.codepipeline, props=props, pipeline_vars=pipeline_vars, stage=stage)
         self.shared_resources_stage(
-            env=env, pipeline=self.codepipeline, props=props, pipeline_vars=pipeline_vars, stage=stage
+            env=env,
+            pipeline=self.codepipeline,
+            props=props,
+            pipeline_vars=pipeline_vars,
+            stage=stage,
         )
 
     def plugins_stage(

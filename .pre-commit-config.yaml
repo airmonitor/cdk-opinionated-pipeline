@@ -72,10 +72,6 @@ repos:
       - id: xenon
         args: ["--max-average=A", "--max-modules=A", "--max-absolute=B", "-e 'tests/*,.venv/*,cdk.out/*'"]
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.18.1
-    hooks:
-      - id: gitleaks
-  - repo: https://github.com/gitleaks/gitleaks
     rev: "v8.18.1"
     hooks:
       - id: gitleaks

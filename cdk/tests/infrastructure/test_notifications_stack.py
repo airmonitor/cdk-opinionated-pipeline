@@ -1,14 +1,15 @@
 """Test CDK template."""
-from os import path, walk
-import yaml
+from os import environ, walk
+from pathlib import Path
+
 import aws_cdk as cdk
+import pytest
+import yaml
+
 from aws_cdk.assertions import Template
 
 from cdk.schemas.configuration_vars import PipelineVars
 from cdk.stacks.notifications_stack import NotificationsStack
-
-import pytest
-from os import environ
 
 STAGE = environ["STAGE"]
 
@@ -16,16 +17,18 @@ STAGE = environ["STAGE"]
 def load_properties() -> dict:
     """Load all configuration values from yaml files and generate dictionary
     from them :return:"""
-    with open("cdk/config/config-ci-cd.yaml", encoding="utf-8") as file:
+    config_path = Path("cdk/config/config-ci-cd.yaml")
+    with config_path.open(encoding="utf-8") as file:
         props = yaml.safe_load(file)
         props["stage"] = STAGE
 
     props_env: dict[list, dict] = {}
 
     # pylint: disable=W0612
-    for dir_path, dir_names, files in walk(f"cdk/config/{STAGE}", topdown=False):
+    for dir_path, dir_names, files in walk(f"cdk/config/{STAGE}", topdown=False):  # noqa
         for file_name in files:
-            with open(path.join(dir_path, file_name), encoding="utf-8") as f:
+            file_path = Path(f"{dir_path}/{file_name}")
+            with file_path.open(encoding="utf-8") as f:
                 props_env |= yaml.safe_load(f)
                 props = {**props_env, **props}
 
@@ -43,7 +46,24 @@ ENV = cdk.Environment(
 
 @pytest.fixture
 def stack_template() -> Template:
-    """Returns CDK template."""
+    """Fixture to create a CDK stack template from the NotificationsStack.
+
+    Parameters:
+      - None
+
+    Returns:
+      - stack_template (Template): The CDK stack template generated from
+        the NotificationsStack.
+
+    Functionality:
+      - Creates a CDK App
+      - Initializes an instance of NotificationsStack with the app, name, env
+        and props
+      - Uses Template.from_stack() to generate a Template object from the stack
+      - Returns this Template, which can be used in tests to validate the
+        infrastructure being created.
+    """
+
     app = cdk.App()
     stack = NotificationsStack(app, "stack", env=ENV, props=PROPS)
     return Template.from_stack(stack)
@@ -51,20 +71,72 @@ def stack_template() -> Template:
 
 # pylint: disable=redefined-outer-name
 def test_sns_topic_existence(stack_template):
-    """Test if ssm parameters exists."""
+    """
+    Tests that the AWS::SNS::Topic resource exists in the CDK stack template.
+
+    Parameters:
+      - stack_template (Template): The CDK stack template to check.
+
+    Functionality:
+      - Uses stack_template.resource_count_is() to assert there is 1 AWS::SNS::Topic
+        resource defined in the template.
+        This checks that the expected SNS topic
+        resource has been created in the CDK stack.
+
+    """
+
     stack_template.resource_count_is("AWS::SNS::Topic", 1)
 
 
 def test_sns_subscription_existence(stack_template):
-    """Test if ssm parameters exists."""
+    """
+    Tests that the AWS::SNS::Subscription resource exists in the CDK stack template.
+
+    Parameters:
+    - stack_template (Template): The CDK stack template to check.
+
+    Functionality:
+    - Uses stack_template.resource_count_is() to assert there is 1 AWS::SNS::Subscription
+      resource defined in the template.
+      This checks that the expected SNS subscription
+      resource has been created in the CDK stack.
+
+    """
+
     stack_template.resource_count_is("AWS::SNS::Subscription", 1)
 
 
 def test_sns_topic_policy_existence(stack_template):
-    """Test if ssm parameters exists."""
+    """
+    Tests that the AWS::SNS::TopicPolicy resource exists in the CDK stack template.
+
+    Parameters:
+    - stack_template (Template): The CDK stack template to check.
+
+    Functionality:
+    - Uses stack_template.resource_count_is() to assert there is 1 AWS::SNS::TopicPolicy
+      resource defined in the template.
+      This checks that the expected SNS topic policy
+      resource has been created in the CDK stack.
+
+    """
+
     stack_template.resource_count_is("AWS::SNS::TopicPolicy", 1)
 
 
 def test_ssm_parameter_existence(stack_template):
-    """Test if ssm parameters exists."""
+    """
+    Tests that the AWS::SSM::Parameter resource exists in the CDK stack template.
+
+    Parameters:
+    - stack_template (Template): The CDK stack template to check.
+
+    Functionality:
+    - Uses stack_template.resource_count_is() to assert that there is 1 AWS::SSM::Parameter
+      resource defined in the template.
+      This checks that the expected SSM parameter resource
+      has been created in the CDK stack.
+
+    """
+
     stack_template.resource_count_is("AWS::SSM::Parameter", 1)

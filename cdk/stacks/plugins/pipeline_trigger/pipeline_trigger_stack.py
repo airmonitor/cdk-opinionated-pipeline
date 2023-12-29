@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 """Deploy AWS Core application resources."""
 import aws_cdk as cdk
 import aws_cdk.aws_codepipeline as pipeline
@@ -12,33 +11,42 @@ from cdk.schemas.configuration_vars import ConfigurationVars, PipelineVars
 
 
 class PipelineTriggerStack(cdk.Stack):
-    """AWS Lambda that triggers this pipeline when the upstream pipeline
-    succeeded.
+    """Constructs a PipelineTriggerStack that creates a CloudWatch Events rule
+    to trigger a CodePipeline pipeline execution when specified SSM parameters
+    change.
 
-    This pipeline deploys a container image created in the upstream
-    pipeline to ECS fargate
+    Parameters:
+    - scope: The parent CDK construct for this stack.
+    - construct_id: The ID to use for this stack.
+    - env: The CDK environment.
+    - props: A dictionary of configuration variables including:
+      - config_vars: ConfigurationVars object containing project and stage names.
+      - pipeline_vars: PipelineVars object containing plugin configuration.
+    - **kwargs: Additional keyword arguments passed to the Stack constructor.
+
+    The stack does the following:
+
+    1. Filters pipeline_vars.plugins.pipeline_trigger_ssm_parameters to get those matching config_vars.stage.
+
+    2. Define an EventPattern to trigger on Create or Update for those SSM parameters.
+
+    3. Create an IAM role with permissions to start the CodePipeline execution.
+
+    4. Creates a CloudWatch Events Rule targeting the CodePipeline, using the created role.
+
+    The result is a Rule that will detect changes to the specified SSM parameters and trigger
+    a new execution of the CodePipeline.
     """
 
     def __init__(self, scope: Construct, construct_id: str, env: cdk.Environment, props: dict, **kwargs) -> None:
-        """Initialize default parameters from AWS CDK and configuration file.
-
-        :param scope: The AWS CDK parent class from which this class
-            inherits
-        :param construct_id: The name of CDK construct
-        :param env: Tha AWS CDK Environment class which provide AWS
-            Account ID and AWS Region
-        :param props: The dictionary which contain configuration values
-            loaded initially from /config/config-env.yaml
-        :param kwargs:
-        """
         super().__init__(scope, construct_id, env=env, **kwargs)
         config_vars = ConfigurationVars(**props)
         pipeline_vars = PipelineVars(**props)
 
-        # Filter all ssm parameters which have the name of the stage
+        # Filter all ssm parameters that have the name of the stage
         filtered_ssm_parameters = list(
-            filter(lambda x: config_vars.stage in x, pipeline_vars.plugins.pipeline_trigger_ssm_parameters),
-        )
+            filter(lambda x: config_vars.stage in x, pipeline_vars.plugins.pipeline_trigger_ssm_parameters)  # type: ignore
+        )  # type: ignore
 
         event_pattern = events.EventPattern(
             source=["aws.ssm"],
@@ -47,16 +55,13 @@ class PipelineTriggerStack(cdk.Stack):
         )
 
         if filtered_ssm_parameters:
-            print(filtered_ssm_parameters)
             events_iam_role_policy = iam.PolicyDocument(
                 statements=[
                     iam.PolicyStatement(
                         actions=["codepipeline:StartPipelineExecution"],
-                        resources=[
-                            f"arn:aws:codepipeline:{config_vars.aws_region}:{config_vars.aws_account}:{config_vars.project}",
-                        ],
+                        resources=[f"arn:aws:codepipeline:{env.region}:{env.account}:{config_vars.project}"],
                     ),
-                ],
+                ]
             )
             events_iam_role = iam.Role(
                 self,
@@ -75,8 +80,8 @@ class PipelineTriggerStack(cdk.Stack):
                         pipeline=pipeline.Pipeline.from_pipeline_arn(
                             self,
                             id="imported_codepipeline",
-                            pipeline_arn=f"arn:aws:codepipeline:{config_vars.aws_region}:{config_vars.aws_account}:{config_vars.project}",
+                            pipeline_arn=f"arn:aws:codepipeline:{env.region}:{env.account}:{config_vars.project}",
                         ),
-                    ),
+                    )
                 ],
             )

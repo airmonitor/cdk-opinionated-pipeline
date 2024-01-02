@@ -1,4 +1,5 @@
 """Deploy AWS CI/CD stack with all stages."""
+
 from os import walk
 from pathlib import Path
 
@@ -213,6 +214,8 @@ class PipelineStack(cdk.Stack):
                 "pre-commit run --files cdk/stages/*.py",
                 "pre-commit run --files cdk/utils/*.py",
                 "pre-commit run --files cdk/tests/infrastructure/*.py",
+                "pre-commit run --files cdk/tests/integration/*.py",
+                "pre-commit run --files cdk/tests/*.py",
             ],
         )
 

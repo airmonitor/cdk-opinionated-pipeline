@@ -1,4 +1,5 @@
 """Test CDK template."""
+
 from os import environ, walk
 from pathlib import Path
 
@@ -15,8 +16,22 @@ STAGE = environ["STAGE"]
 
 
 def load_properties() -> dict:
-    """Load all configuration values from yaml files and generate dictionary
-    from them :return:"""
+    """Loads configuration properties from YAML files.
+
+    Parameters:
+      - None
+
+    Returns:
+      - props (dict): The loaded configuration properties.
+
+    Functionality:
+      - Loads the base config from cdk/config/config-ci-cd.yaml
+      - Sets the "stage" property to the STAGE environment variable
+      - Walks the cdk/config/{STAGE} directory and loads all YAML files
+      - Merges the loaded configs into a single props dict
+      - Returns the merged props
+    """
+
     config_path = Path("cdk/config/config-ci-cd.yaml")
     with config_path.open(encoding="utf-8") as file:
         props = yaml.safe_load(file)
@@ -44,7 +59,7 @@ ENV = cdk.Environment(
 )
 
 
-@pytest.fixture
+@pytest.fixture()
 def stack_template() -> Template:
     """Fixture to create a CDK stack template from the NotificationsStack.
 

@@ -8,22 +8,40 @@ from aws_cdk import Stack, Stage
 
 
 def check_ansible_dir(directory: str) -> bool:
-    """Check if ansible directory exists in a root path.
+    """Checks if an Ansible directory exists.
 
-    :return: Bool - True if ansible directory exist, false if not
+    Parameters:
+      - directory (str): The directory path to check.
+
+    Returns:
+      - bool: True if the directory exists, False otherwise.
+
+    Functionality:
+      - Resolves the full path using the __file__ variable.
+      - Checks if the path exists and is a directory using pathlib.
+      - Returns True if it's a directory, False otherwise.
     """
+
     this_dir = Path(__file__).parent
     ansible_path = this_dir.joinpath(directory).resolve()
     return ansible_path.is_dir()
 
 
 def apply_tags(props: dict, resource: cdk.Stack | cdk.Stage) -> Stack | Stage:
-    """Add standardized tags to every resource created in stack.
+    """Applies tags to a CDK Stack or Stage.
 
-    :param props: Contain standardized tags (key value) for TR
-    :param resource: CDK Stack, Stage or app
-    :return: Input object (class) with added tags
+    Parameters:
+      - props (dict): Dictionary containing tags to apply
+      - resource (cdk.Stack | cdk.Stage): Stack or Stage to apply tags to
+
+    Returns:
+      - Stack | Stage: The same resource passed in, after tags applied
+
+    Functionality:
+      - Loops through tags in props and adds them to the resource with cdk.Tags.of
+      - Returns the modified resource object
     """
+
     for key, value in props["tags"].items():
         cdk.Tags.of(resource).add(key, value)
 

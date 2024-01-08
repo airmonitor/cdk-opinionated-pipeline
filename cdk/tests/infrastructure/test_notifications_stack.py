@@ -1,56 +1,19 @@
 """Test CDK template."""
 
-from os import environ, walk
-from pathlib import Path
+from os import environ
 
 import aws_cdk as cdk
 import pytest
-import yaml
 
 from aws_cdk.assertions import Template
 
 from cdk.schemas.configuration_vars import PipelineVars
 from cdk.stacks.notifications_stack import NotificationsStack
+from cdk.tests.infrastructure import load_properties
 
 STAGE = environ["STAGE"]
 
-
-def load_properties() -> dict:
-    """Loads configuration properties from YAML files.
-
-    Parameters:
-      - None
-
-    Returns:
-      - props (dict): The loaded configuration properties.
-
-    Functionality:
-      - Loads the base config from cdk/config/config-ci-cd.yaml
-      - Sets the "stage" property to the STAGE environment variable
-      - Walks the cdk/config/{STAGE} directory and loads all YAML files
-      - Merges the loaded configs into a single props dict
-      - Returns the merged props
-    """
-
-    config_path = Path("cdk/config/config-ci-cd.yaml")
-    with config_path.open(encoding="utf-8") as file:
-        props = yaml.safe_load(file)
-        props["stage"] = STAGE
-
-    props_env: dict[list, dict] = {}
-
-    # pylint: disable=W0612
-    for dir_path, dir_names, files in walk(f"cdk/config/{STAGE}", topdown=False):  # noqa
-        for file_name in files:
-            file_path = Path(f"{dir_path}/{file_name}")
-            with file_path.open(encoding="utf-8") as f:
-                props_env |= yaml.safe_load(f)
-                props = {**props_env, **props}
-
-    return props
-
-
-PROPS = load_properties()
+PROPS = load_properties(stage=STAGE)
 
 PIPELINE_VARS = PipelineVars(**PROPS)
 ENV = cdk.Environment(

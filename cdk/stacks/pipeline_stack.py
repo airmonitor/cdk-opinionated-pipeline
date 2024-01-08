@@ -62,7 +62,7 @@ class PipelineStack(cdk.Stack):
                 ],
                 build_environment=codebuild.BuildEnvironment(
                     compute_type=codebuild.ComputeType.SMALL,
-                    build_image=codebuild.LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0,
+                    build_image=codebuild.LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0,  # type: ignore
                 ),
             ),
             synth=pipelines.ShellStep(
@@ -121,7 +121,7 @@ class PipelineStack(cdk.Stack):
 
     def create_pipeline_notifications(
         self,
-        notifications_sns_topic: sns.Topic,
+        notifications_sns_topic: sns.Topic | sns.ITopic,
         notification_vars: NotificationVars,
         pipeline_vars: PipelineVars,
     ):
@@ -165,8 +165,8 @@ class PipelineStack(cdk.Stack):
             rule_name=f"{pipeline_vars.project}-scheduled-release",
             schedule=schedule,
         )
-        trigger.add_target(events_targets.CodePipeline(self.codepipeline.pipeline))
-        apply_tags(props=props, resource=trigger)
+        trigger.add_target(events_targets.CodePipeline(self.codepipeline.pipeline))  # type: ignore
+        apply_tags(props=props, resource=trigger)  # type: ignore
 
     def code_quality_stage(
         self,
@@ -286,16 +286,28 @@ class PipelineStack(cdk.Stack):
         props: dict,
         pipeline_vars: PipelineVars,
     ) -> None:
-        """Create core shared resources stage.
+        """Create shared resources stage.
 
-        :param stage: The type of environment, example prod, ppe, dr
-        :param env: The AWS CDK Environment class which provides AWS
-            Account ID and AWS Region
-        :param pipeline: The AWS CDK pipelines CdkPipeline object
-        :param props: The dictionary loaded from config directory
-        :param pipeline_vars: Pydantic model that contains configuration
-            values loaded initially from config files
-        :return: None
+        parameters:
+
+        - env (cdk.Environment): The AWS CDK Environment class which provides AWS Account ID and AWS Region.
+
+        - stage (str): The type of environment, example prod, ppe, dr.
+
+        - pipeline (pipelines.CodePipeline): The AWS CDK pipelines CdkPipeline object.
+
+        - props (dict): The dictionary loaded from config directory.
+
+        - pipeline_vars (PipelineVars):
+        Pydantic model that contains configuration values loaded initially from config files.
+
+        functionality:
+
+        - create a SharedResourcesStage construct with the provided parameters.
+
+        - apply tags to the stage based on props.
+
+        - add the stage to the pipeline.
         """
         stage = SharedResourcesStage(
             self,
@@ -418,16 +430,28 @@ class PipelineStack(cdk.Stack):
         props: dict,
         pipeline_vars: PipelineVars,
     ) -> None:
-        """Create Bots stage.
+        """Create plugin stage.
 
-        :param stage: The type of environment, example prod, ppe, dr
-        :param env: The AWS CDK Environment class which provides AWS
-            Account ID and AWS Region
-        :param pipeline: The AWS CDK pipelines CdkPipeline object
-        :param props: The dictionary loaded from config directory
-        :param pipeline_vars: Pydantic model that contains configuration
-            values loaded initially from config files
-        :return: None
+        parameters:
+
+        - env (cdk.Environment): The AWS CDK Environment class which provides AWS Account ID and AWS Region.
+
+        - stage (str): The type of environment, example prod, ppe, dr.
+
+        - pipeline (pipelines.CodePipeline): The AWS CDK pipelines CdkPipeline object.
+
+        - props (dict): The dictionary loaded from config directory.
+
+        - pipeline_vars (PipelineVars):
+        Pydantic model that contains configuration values loaded initially from config files.
+
+        functionality:
+
+        - create a PluginsStage construct with the provided parameters.
+
+        - apply tags to the stage based on props.
+
+        - add the stage to the pipeline.
         """
 
         pipeline_stage = PluginsStage(

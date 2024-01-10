@@ -3,6 +3,7 @@ before core stack will be created.
 
 Example is SSM parameter store entry ci/cd configuration values
 """
+
 from os import walk
 from pathlib import Path
 
@@ -18,15 +19,34 @@ from cdk.schemas.configuration_vars import ConfigurationVars
 
 
 class InfrastructureTestsStack(cdk.Stack):
-    """Create SSM Parameter required by CDK Pipelines.
-
-    As CDK pipeline can't contain empty stage to which additional jobs
-    will be added, this stack will create AWS SSM parameter store with
-    the content of used configuration file. It is done like this as a
-    workaround to the CDK pipelines limitations.
-    """
+    """Infrastructure tests stack."""
 
     def __init__(self, scope: Construct, construct_id: str, env, props, **kwargs) -> None:
+        """Initializes the InfrastructureTestsStack construct.
+
+        Parameters:
+        - scope (Construct): The parent construct.
+        - construct_id (str): The construct ID.
+        - env: The CDK environment.
+        - props: Stack configuration properties.
+        - **kwargs: Additional keyword arguments passed to the Stack constructor.
+
+        The constructor does the following:
+
+        1. Call the parent Stack constructor.
+
+        2. Loads configuration from YAML files in the config directory for the stage.
+
+        3. Merge the loaded configuration with the passed props.
+
+        4. Create a ConfigurationVars object from the merged configuration.
+
+        5. Create an SSM StringParameter to store the ConfigurationVars as a string,
+           for later retrieval.
+
+        6. Validates the stack against the AWS Solutions checklist using Aspects.
+        """
+
         super().__init__(scope, construct_id, env=env, **kwargs)
         props_env: dict[list, dict] = {}
 

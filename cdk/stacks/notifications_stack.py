@@ -2,6 +2,7 @@
 
 Example sns alarm topic
 """
+
 from os import walk
 from pathlib import Path
 
@@ -28,17 +29,38 @@ class NotificationsStack(cdk.Stack):
     """
 
     def __init__(self, scope: Construct, construct_id: str, env: cdk.Environment, props: dict, **kwargs) -> None:
-        """Initialize default parameters from AWS CDK and configuration file.
+        """Initializes the NotificationsStack construct.
 
-        :param scope: The AWS CDK parent class from which this class
-            inherits
-        :param construct_id: The name of CDK construct
-        :param env: The AWS CDK Environment class which provides AWS
-            Account ID and AWS Region
-        :param props: The dictionary which contain configuration values
-            loaded initially from /config/config-env.yaml
-        :param kwargs:
+        Parameters:
+        - scope (Construct): The parent construct.
+        - construct_id (str): The construct ID.
+        - env (cdk.Environment): The CDK environment.
+        - props (dict): Stack configuration properties.
+        - **kwargs: Additional keyword arguments passed to the Stack constructor.
+
+        The constructor does the following:
+
+        1. Call the parent Stack constructor.
+
+        2. Loads configuration variables from YAML files.
+
+        3. Create a NotificationVars object from props.
+
+        4. Creates an SNS topic for alarms using the SNSTopic construct.
+
+        5. Grants CloudWatch permissions to publish to the SNS topic.
+
+        6. Creates an SSM parameter to store the SNS topic ARN.
+
+        7. Subscribe an email address to the SNS topic.
+
+        8. Conditionally create a Chatbot Slack channel subscription if Slack credentials are provided.
+
+        9. Adds CFN-NAG suppression.
+
+        10. Validates the stack against the AWS Solutions checklist using Aspects.
         """
+
         super().__init__(scope, construct_id, env=env, **kwargs)
         config_vars = ConfigurationVars(**props)
 

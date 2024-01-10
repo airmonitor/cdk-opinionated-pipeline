@@ -1,4 +1,5 @@
 """Deploy AWS CodeCommit repository."""
+
 import aws_cdk as cdk
 import aws_cdk.aws_codecommit as codecommit
 
@@ -13,17 +14,26 @@ class RepositoryStack(cdk.Stack):
     """Repository stack."""
 
     def __init__(self, scope: Construct, construct_id: str, env: cdk.Environment, props: dict, **kwargs) -> None:
-        """Initialize default parameters from AWS CDK and configuration file.
+        """Initializes the RepositoryStack construct.
 
-        :param scope: The AWS CDK parent class from which this class
-            inherits
-        :param construct_id: The name of CDK construct
-        :param env: Tha AWS CDK Environment class which provides AWS
-            Account ID and AWS Region
-        :param props: The dictionary which contain configuration values
-            loaded initially from /config/config-env.yaml
-        :param kwargs:
+        Parameters:
+        - scope (Construct): The parent construct.
+        - construct_id (str): The construct ID.
+        - env (cdk.Environment): The CDK environment.
+        - props (dict): Stack configuration properties.
+        - **kwargs: Additional keyword arguments passed to the Stack constructor.
+
+        The constructor does the following:
+
+        1. Call the parent Stack constructor.
+
+        2. Create a PipelineVars object from the props.
+
+        3. Create an AWS CodeCommit repository with the name configured in PipelineVars.
+
+        4. Validates the stack against the AWS Solutions checklist using Aspects.
         """
+
         super().__init__(scope, construct_id, env=env, **kwargs)
         pipeline_vars = PipelineVars(**props)
 

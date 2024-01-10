@@ -8,7 +8,8 @@
     "@aws-cdk/aws-rds:lowercaseDbIdentifier": true,
     "@aws-cdk/aws-efs:defaultEncryptionAtRest": true,
     "@aws-cdk/aws-lambda:recognizeVersionProps": true,
-    "@aws-cdk/core:newStyleStackSynthesis": true
+    "@aws-cdk/core:newStyleStackSynthesis": true,
+    "@aws-cdk/customresources:installLatestAwsSdkDefault": true
   },
   "watch": {
     "include": "services/functions/**"

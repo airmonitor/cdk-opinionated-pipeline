@@ -9,7 +9,8 @@
     "@aws-cdk/aws-efs:defaultEncryptionAtRest": true,
     "@aws-cdk/aws-lambda:recognizeVersionProps": true,
     "@aws-cdk/core:newStyleStackSynthesis": true,
-    "@aws-cdk/customresources:installLatestAwsSdkDefault": true
+    "@aws-cdk/customresources:installLatestAwsSdkDefault": true,
+    "@aws-cdk/core:suppressTemplateIndentation": true
   },
   "watch": {
     "include": "services/functions/**"

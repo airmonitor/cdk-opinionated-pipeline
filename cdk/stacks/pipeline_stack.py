@@ -125,15 +125,26 @@ class PipelineStack(cdk.Stack):
         notification_vars: NotificationVars,
         pipeline_vars: PipelineVars,
     ):
-        """Create pipeline notifications through email and Slack channel.
+        """Creates notifications for the pipeline.
 
-        :param notification_vars:
-        :param notifications_sns_topic: CDK object for an SNS topic to
-            which notifications will be sent
-        :param pipeline_vars: Pydantic model that contains configuration
-            values loaded initially from config files
-        :return:
+        parameters:
+
+        notifications_sns_topic (sns.Topic | sns.ITopic): The SNS topic to publish notifications to.
+
+        pipeline_vars (PipelineVars): A Pydantic model containing pipeline configuration values like
+        notification email, Slack workspace ID, etc.
+
+        functionality:
+
+        1. if a notification email address is provided in pipeline_vars, enable email notifications by calling
+        pipeline_email_notifications()
+
+        2. enable default pipeline notifications by calling pipeline_notifications()
+
+        3. if Slack workspace ID and channel ID are provided in pipeline_vars, enable Slack notifications by
+        creating a SlackChannelConfiguration construct
         """
+
         # Enable SNS notifications if the recipient email address was provided
         if pipeline_vars.ci_cd_notification_email:
             self.pipeline_email_notifications(sns_topic=notifications_sns_topic)
@@ -150,11 +161,24 @@ class PipelineStack(cdk.Stack):
             )
 
     def pipeline_trigger(self, pipeline_vars: PipelineVars, props: dict, schedule: events.Schedule):
-        """
+        """Creates a scheduled rule to trigger the pipeline.
 
-        :param schedule: The events schedule object
-        :param pipeline_vars: Pydantic model that contains configuration values loaded initially from config files
-        :param props: The dictionary which contains configuration values loaded initially from /config/config-env.yaml
+        parameters:
+
+        pipeline_vars (PipelineVars): A model containing pipeline configuration values.
+
+        props (dict): A dictionary of configuration properties.
+
+        schedule (events.Schedule): The scheduled interval to trigger the pipeline.
+
+        functionality:
+
+        1. create a Rule with the provided schedule, enabled status, name, and description.
+
+        2. add the pipeline as a target for the rule.
+        this will trigger the pipeline on the schedule.
+
+        3. apply tags to the rule based on props.
         """
         # Auto triggers the pipeline every day to ensure pipeline validation
         trigger = events.Rule(
@@ -176,17 +200,34 @@ class PipelineStack(cdk.Stack):
         stage: str,
         pipeline_vars: PipelineVars,
     ) -> None:
-        """Create CI/CD stage which contains several jobs for checking code
-        quality using various linters. Stage will be added to an existing
-        pipeline.
+        """Creates a code quality stage in the pipeline.
 
-        :param pipeline_vars: Pydantic model that contains configuration values loaded initially from config files
-        :param env: The AWS CDK Environment class which provide AWS Account ID and AWS Region
-        :param pipeline: The AWS CDK pipelines CdkPipeline object
-        :param props: The dictionary loaded from config directory.
-        :param stage: The stage at which deploy - example: dr, prod, ppe
+        parameters:
 
-        :return: None
+        env (cdk.Environment): The CDK environment object.
+
+        pipeline (pipelines.CodePipeline): The CDK pipeline object.
+
+        props (dict): A dictionary of configuration properties.
+
+        stage (str): The name of the stage (e.g. 'dev', 'prod').
+
+        pipeline_vars (PipelineVars): A model containing pipeline configuration values.
+
+
+        functionality:
+
+        1. create a new CodeQualityStage with the provided parameters.
+
+        2. apply tags to the stage based on props.
+
+        3. create a ShellStep to run pre-commit on source files.
+
+        4. create a ShellStep to run ansible-lint if there is an ansible directory.
+
+        5. add the ShellSteps as pre-jobs to the stage.
+
+        6. add the stage to the pipeline.
         """
         props["stage"] = stage
         stage = CodeQualityStage(
@@ -241,15 +282,35 @@ class PipelineStack(cdk.Stack):
         stage: str,
         pipeline_vars: PipelineVars,
     ) -> None:
-        """Create CI/CD stage which contains several jobs for various tests.
+        """Creates an infrastructure test stage in the pipeline.
 
-        :param pipeline_vars: Pydantic model that contains configuration values loaded initially from config files
-        :param env: The AWS CDK Environment class which provides AWS Account ID and AWS Region
-        :param pipeline: The AWS CDK pipelines CdkPipeline object
-        :param props: The dictionary loaded from config directory.
-        :param stage: The stage at which deploy - example: dr, prod, ppe
+        parameters:
 
-        :return: None
+        env (cdk.Environment): The CDK environment object.
+
+        pipeline (pipelines.CodePipeline): The CDK pipeline object.
+
+        props (dict): A dictionary of configuration properties.
+
+        stage (str): The name of the stage (e.g. 'dev', 'prod').
+
+        pipeline_vars (PipelineVars): A model containing pipeline configuration values.
+
+        functionality:
+
+        1. create a new InfrastructureTestsStage with the provided parameters.
+
+        2. apply tags to the stage based on props.
+
+        3. create a ShellStep to run infrastructure tests:
+           - Install dependencies
+           - Install AWS CDK
+           - Install pytest
+           - Run pytest on the infrastructure tests and pass the stage name
+
+        4. add the ShellStep as a pre-job to the stage.
+
+        5. add the stage to the pipeline.
         """
         props["stage"] = stage
         stage = InfrastructureTestsStage(
@@ -319,11 +380,21 @@ class PipelineStack(cdk.Stack):
         pipeline.add_stage(stage=stage)
 
     def notifications_topic(self, pipeline_vars: PipelineVars) -> sns.Topic:
-        """Create an SNS topic used in CI/CD notifications.
+        """Creates an SNS topic for pipeline notifications.
 
-        :param pipeline_vars: Pydantic model that contains configuration
-            values loaded initially from config files
-        :return sns.Topic: The AWS SNS Topic instance
+        parameters:
+
+        pipeline_vars (PipelineVars): A model containing pipeline configuration values like notification email.
+
+        functionality:
+
+        1. create an SNS topic called 'notifications_topic' to be used for notifications.
+
+        2. add a subscription to the topic using the email address from pipeline_vars.
+
+        3. add metadata to suppress cdk_nag warnings about encryption.
+
+        4. return the created SNS topic.
         """
         notifications_sns_topic = sns.Topic(self, "notifications_topic", display_name="CodePipeline notifications")
         notifications_sns_topic.add_subscription(
@@ -346,11 +417,18 @@ class PipelineStack(cdk.Stack):
 
     @staticmethod
     def pipeline_email_notifications(sns_topic: sns.Topic) -> None:
-        """Create SNS subscription which will be used to send email
-        notifications during CodePipeline execution.
+        """Configures email notifications for the pipeline SNS topic.
 
-        :param sns_topic: The AWS CDK SNS topic instance
-        :return: None
+        parameters:
+
+        sns_topic (sns.Topic): The SNS topic to configure notifications for.
+
+        functionality:
+
+        - adds a resource policy to the SNS topic to allow CodeStar Notifications
+        to publish messages to it.
+
+        - this enables email notifications to be sent on pipeline events.
         """
         sns_topic.add_to_resource_policy(
             iam.PolicyStatement(
@@ -362,11 +440,26 @@ class PipelineStack(cdk.Stack):
         )
 
     def pipeline_notifications(self, sns_topic: sns.ITopic) -> None:
-        """Create SNS subscription which will be used to send email
-        notifications during CodePipeline execution.
+        """Configures notifications for pipeline events.
 
-        :return: None
+        parameters:
+
+        sns_topic (sns.ITopic): The SNS topic to send notifications to.
+
+        functionality:
+
+        1. add resource policy to an SNS topic to allow CodeStar Notifications to publish.
+
+        2. create a NotificationRule to send notifications on pipeline events:
+           - Pipeline execution failed
+           - Action execution failed
+           - Stage execution failed
+           - Manual approval failed
+           - Manual approval needed
+
+        the notification rule will send messages to the provided SNS topic.
         """
+
         sns_topic.add_to_resource_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -394,13 +487,31 @@ class PipelineStack(cdk.Stack):
         )
 
     def environment_type(self, env: cdk.Environment, stage: str, props: dict):
-        """Create environment using a dedicated AWS account, including a
-        different AWS region.
+        """Loads environment configuration and creates pipeline stages.
 
-        :param stage: The type of environment, example prod, ppe, dr
-        :param env: The AWS CDK environment object.
-        :param props: The dictionary loaded from config directory.
+        parameters:
+
+        env (cdk.Environment): The CDK environment object.
+
+        stage (str): The environment name (e.g. 'dev', 'prod').
+
+        props (dict): Pipeline configuration properties.
+
+        functionality:
+
+        1. load all YAML config files for the environment into props_env.
+
+        2. merge props_env and props into a single props dict.
+
+        3. create a PipelineVars model from the merged props.
+
+        4. call plugins_stage() to create the Plugins stage, passing props and PipelineVars.
+
+        5. call shared_resources_stage() to create the shared resources stage, passing props, and PipelineVars.
+
+        this allows environment-specific configuration to be loaded from YAML files and passed to the pipeline stages.
         """
+
         props_env: dict[list, dict] = {}
 
         # pylint: disable=W0612

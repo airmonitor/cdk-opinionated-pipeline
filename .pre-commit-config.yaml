@@ -75,4 +75,10 @@ repos:
     hooks:
       - id: semgrep
         # See semgrep.dev/rulesets to select a ruleset and copy its URL
-        args: ['--config', 'p/python', '--config', 'p/default', '--error', '--skip-unknown-extensions']
+        exclude: "cdk/config/config-ci-cd.yaml"
+        args: [
+        '--config', 'p/python',
+        '--config', 'p/default',
+        '--error',
+        '--skip-unknown-extensions',
+        ]

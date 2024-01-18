@@ -33,10 +33,10 @@ class Observability(BaseModel):
 class PipelinePluginsVars(BaseModel):
     """Defines the PipelinePluginsVars model.
 
-    parameters:
+    Parameters:
       - None
 
-    attributes:
+    Attributes:
 
       - pipeline_trigger (bool | None): Whether to enable the pipeline trigger plugin.
       optional.
@@ -44,7 +44,7 @@ class PipelinePluginsVars(BaseModel):
       - pipeline_trigger_ssm_parameters (list | None): List of SSM parameters to trigger the pipeline.
       optional.
 
-    functionality:
+    Functionality:
 
       - defines a Pydantic model for pipeline plugins configuration.
       - pipeline_trigger enables/disables the pipeline trigger plugin.
@@ -59,10 +59,10 @@ class PipelinePluginsVars(BaseModel):
 class PipelineVars(BaseModel):
     """Defines the PipelineVars model.
 
-    parameters:
+    Parameters:
       - None
 
-    attributes:
+    Attributes:
 
       - aws_region (Literal["eu-central-1", "us-west-2"]): The AWS region to deploy to.
 
@@ -80,7 +80,7 @@ class PipelineVars(BaseModel):
 
       - plugins (PipelinePluginsVars): Configuration for pipeline plugins.
 
-    functionality:
+    Functionality:
 
       - defines a Pydantic model for general pipeline configuration.
       - Constrains attributes with validations where applicable.
@@ -100,17 +100,17 @@ class PipelineVars(BaseModel):
 class ConfigurationVars(PipelineVars):
     """Defines the ConfigurationVars model.
 
-    parameters:
+    Parameters:
       - None
 
-    attributes:
+    Attributes:
 
       - stage (Literal["dev", "ppe", "prod"]): The deployment stage.
       constrained to "dev", "ppe", or "prod".
 
       - alarm_emails (list[EmailStr]): A list of emails to receive alarm notifications.
 
-    functionality:
+    Functionality:
 
       - extends the PipelineVars model with additional configuration attributes.
       - Constrains stage to a predefined set of options.
@@ -124,10 +124,10 @@ class ConfigurationVars(PipelineVars):
 class NotificationVars(BaseModel):
     """Defines the NotificationVars model.
 
-    parameters:
+    Parameters:
       - None
 
-    attributes:
+    Attributes:
 
       - slack_channel_id_alarms (constr | None): Optional Slack channel for alarm notifications.
       constrained to 11 characters.
@@ -137,7 +137,7 @@ class NotificationVars(BaseModel):
 
       - slack_workspace_id (constr): Required Slack workspace ID. Constrained to 11 characters.
 
-    functionality:
+    Functionality:
 
       - defines a Pydantic model for notification configuration.
       - Allows configuring different Slack channels for alarms and general notifications.

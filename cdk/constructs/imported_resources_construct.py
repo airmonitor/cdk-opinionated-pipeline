@@ -12,9 +12,7 @@ from cdk.schemas.configuration_vars import (
 class ImportedCoreResources(Construct):
     """Imported resources for the Core stack."""
 
-    # pylint: disable=W0622
-    # pylint: disable=W0613
-    def __init__(self, scope: Construct, construct_id: str, props, env):
+    def __init__(self, scope: Construct, construct_id: str, props, env):  # noqa: ARG002
         super().__init__(scope, construct_id)
 
         self.pipeline_vars = PipelineVars(**props)

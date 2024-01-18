@@ -1,13 +1,15 @@
 """Main script for an AWS CDK framework which deploys the AWS CI/CD pipeline
 stack."""
+
 from pathlib import Path
 
 import aws_cdk as cdk
 import yaml
 
+from cdk_opinionated_constructs.utils import apply_tags
+
 from cdk.schemas.configuration_vars import PipelineVars
 from cdk.stacks.pipeline_stack import PipelineStack
-from cdk.utils.utils import apply_tags
 
 app = cdk.App()
 

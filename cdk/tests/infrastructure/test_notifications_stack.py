@@ -6,9 +6,9 @@ import aws_cdk as cdk
 import pytest
 
 from aws_cdk.assertions import Template
+from cdk_opinionated_constructs.stacks.notifications_stack import NotificationsStack
 
 from cdk.schemas.configuration_vars import PipelineVars
-from cdk.stacks.notifications_stack import NotificationsStack
 from cdk.tests.infrastructure import load_properties
 
 STAGE = environ["STAGE"]

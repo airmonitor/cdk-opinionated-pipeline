@@ -6,5 +6,5 @@ docutils==0.21.2
 email-validator==2.1.2
 pydantic==2.7.2
 pydantic-core>=2.14
-pydoctor==23.9.1
+pydoctor==24.3.3
 pyyaml==6.0.1

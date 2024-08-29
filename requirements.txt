@@ -8,3 +8,4 @@ pydantic==2.8.2
 pydantic-core>=2.23.0
 pydoctor==24.3.3
 pyyaml==6.0.2
+urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability

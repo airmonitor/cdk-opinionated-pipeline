@@ -4,12 +4,13 @@ from os import environ
 
 import aws_cdk as cdk
 import pytest
+import yaml
 
 from aws_cdk.assertions import Template
 from cdk_opinionated_constructs.stacks.notifications_stack import NotificationsStack
+from cdk_opinionated_constructs.utils import load_properties
 
 from cdk.schemas.configuration_vars import PipelineVars
-from cdk.tests.infrastructure import load_properties
 
 STAGE = environ["STAGE"]
 
@@ -22,7 +23,7 @@ ENV = cdk.Environment(
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def stack_template() -> Template:
     """Fixture to create a CDK stack template from the NotificationsStack.
 
@@ -81,7 +82,7 @@ def test_sns_subscription_existence(stack_template):
 
     """
 
-    stack_template.resource_count_is("AWS::SNS::Subscription", 1)
+    stack_template.resource_count_is("AWS::SNS::Subscription", 2)
 
 
 def test_sns_topic_policy_existence(stack_template):
@@ -118,3 +119,18 @@ def test_ssm_parameter_existence(stack_template):
     """
 
     stack_template.resource_count_is("AWS::SSM::Parameter", 1)
+
+
+def test_snapshot(stack_template, snapshot):
+    """Tests that the stack template matches a snapshot.
+
+    Parameters:
+    - stack_template: The CDK stack template to check. 
+    - snapshot: The snapshot tester to match against.
+
+    Functionality:
+    - Dumps the stack template to YAML and asserts it matches a snapshot file
+      with name formatted as {stack_name}_{stage}.yaml.
+      This allows snapshot testing the infrastructure stack template.
+    """
+    snapshot.assert_match(yaml.dump(stack_template.to_json()), f"notifications_stack_{STAGE}.yaml")

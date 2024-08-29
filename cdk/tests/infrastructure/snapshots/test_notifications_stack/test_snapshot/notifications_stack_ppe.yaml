@@ -1,0 +1,139 @@
+Metadata:
+  cdk_nag:
+    rules_to_suppress:
+    - id: AwsSolutions-SNS2
+      reason: Notifications stack, doesn't require encryption
+    - id: AwsSolutions-IAM4
+      reason: Wildcard permissions are used in Deny section
+    - id: AwsSolutions-IAM5
+      reason: Wildcard permissions are used in Deny section
+Parameters:
+  BootstrapVersion:
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically
+      retrieved from SSM Parameter Store. [cdk:skip]
+    Type: AWS::SSM::Parameter::Value<String>
+Resources:
+  iamrolechatbotD59C6A55:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: chatbot.amazonaws.com
+        Version: '2012-10-17'
+      ManagedPolicyArns:
+      - Fn::Join:
+        - ''
+        - - 'arn:'
+          - Ref: AWS::Partition
+          - :iam::aws:policy/ReadOnlyAccess
+    Type: AWS::IAM::Role
+  iamrolechatbotDefaultPolicyE2C24E5B:
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Action:
+          - iam:*
+          - s3:GetBucketPolicy
+          - ssm:*
+          - sts:*
+          - kms:*
+          - cognito-idp:GetSigningCertificate
+          - ec2:GetPasswordData
+          - ecr:GetAuthorizationToken
+          - gamelift:RequestUploadCredentials
+          - gamelift:GetInstanceAccess
+          - lightsail:DownloadDefaultKeyPair
+          - lightsail:GetInstanceAccessDetails
+          - lightsail:GetKeyPair
+          - lightsail:GetKeyPairs
+          - redshift:GetClusterCredentials
+          - storagegateway:DescribeChapCredentials
+          Effect: Deny
+          Resource: '*'
+        - Action:
+          - cloudwatch:Describe*
+          - cloudwatch:Get*
+          - cloudwatch:List*
+          Effect: Allow
+          Resource: '*'
+        - Action: codepipeline:RetryStageExecution
+          Effect: Allow
+          Resource: '*'
+        Version: '2012-10-17'
+      PolicyName: iamrolechatbotDefaultPolicyE2C24E5B
+      Roles:
+      - Ref: iamrolechatbotD59C6A55
+    Type: AWS::IAM::Policy
+  snstopicssmparam0CEDE050:
+    Properties:
+      Name: /cdk-opinionated-pipeline/ppe/topic/alarm/arn
+      Type: String
+      Value:
+        Ref: topicconstructcdkopinionatedpipelineppealarms53804817
+    Type: AWS::SSM::Parameter
+  topicconstructcdkopinionatedpipelineppealarms53804817:
+    Properties:
+      TopicName: cdk-opinionated-pipeline-ppe-alarms
+    Type: AWS::SNS::Topic
+  topicconstructcdkopinionatedpipelineppealarmsPolicy8AF77EC7:
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Action: sns:Publish
+          Effect: Allow
+          Principal:
+            Service: cloudwatch.amazonaws.com
+          Resource:
+            Ref: topicconstructcdkopinionatedpipelineppealarms53804817
+          Sid: CloudWatchPolicy
+        - Action: sns:Publish
+          Condition:
+            Bool:
+              aws:SecureTransport: 'false'
+          Effect: Deny
+          Principal: '*'
+          Resource:
+            Ref: topicconstructcdkopinionatedpipelineppealarms53804817
+          Sid: AllowPublishThroughSSLOnly
+        - Action: sns:Publish
+          Effect: Allow
+          Principal:
+            Service: budgets.amazonaws.com
+          Resource:
+            Ref: topicconstructcdkopinionatedpipelineppealarms53804817
+          Sid: AWSBudgetsPolicy
+        Version: '2012-10-17'
+      Topics:
+      - Ref: topicconstructcdkopinionatedpipelineppealarms53804817
+    Type: AWS::SNS::TopicPolicy
+  topicconstructcdkopinionatedpipelineppealarmsthisemailalarmsgmailcomC4D2538E:
+    Properties:
+      Endpoint: this_email_alarms@gmail.com
+      Protocol: email
+      TopicArn:
+        Ref: topicconstructcdkopinionatedpipelineppealarms53804817
+    Type: AWS::SNS::Subscription
+  topicconstructcdkopinionatedpipelineppealarmsthisemailcicdgmailcom82BA91B6:
+    Properties:
+      Endpoint: this_email_ci_cd@gmail.com
+      Protocol: email
+      TopicArn:
+        Ref: topicconstructcdkopinionatedpipelineppealarms53804817
+    Type: AWS::SNS::Subscription
+Rules:
+  CheckBootstrapVersion:
+    Assertions:
+    - Assert:
+        Fn::Not:
+        - Fn::Contains:
+          - - '1'
+            - '2'
+            - '3'
+            - '4'
+            - '5'
+          - Ref: BootstrapVersion
+      AssertDescription: CDK bootstrap stack version 6 required. Please run 'cdk bootstrap'
+        with a recent version of the CDK CLI.

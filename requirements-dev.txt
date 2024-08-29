@@ -2,3 +2,4 @@ boto3==1.35.8
 click==8.1.7
 docutils==0.21.2
 pydoctor==24.3.3
+urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability

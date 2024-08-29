@@ -1,8 +1,12 @@
+"""CDK Setup file."""
+
 from pathlib import Path
 
 import setuptools
 
-long_description = Path("README.md").read_text()
+readme = Path("README.md")
+with readme.open(encoding="utf-8") as f:
+    long_description = f.read()
 
 setuptools.setup(
     name="ci_cd_pipeline",

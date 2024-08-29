@@ -57,42 +57,20 @@ class PipelinePluginsVars(BaseModel):
 
 
 class PipelineVars(BaseModel):
-    """Defines the PipelineVars model.
-
-    Parameters:
-      - None
-
-    Attributes:
-
-      - aws_region (Literal["eu-central-1", "us-west-2"]): The AWS region to deploy to.
-
-      - aws_account (constr): The AWS account ID. Constrained to 12 characters.
-
-      - project (str): The name of the project.
-
-      - repository (constr): The name of the Git repository.
-      constrained between 3 and 255 characters.
-
-      - ci_cd_notification_email (EmailStr): The email address to send CI/CD notifications to.
-
-      - slack_ci_cd_channel_id (constr | None): Optional Slack channel ID for CI/CD notifications.
-      constrained to 11 characters.
-
-      - plugins (PipelinePluginsVars): Configuration for pipeline plugins.
-
-    Functionality:
-
-      - defines a Pydantic model for general pipeline configuration.
-      - Constrains attributes with validations where applicable.
-      - plugin attribute holds config for pipeline plugins.
-    """
-
     aws_region: Literal["eu-central-1", "us-west-2"]
     aws_account: constr(min_length=12, max_length=12)  # type: ignore
+
     project: str
+
     repository: constr(min_length=3, max_length=255)  # type: ignore
+
     ci_cd_notification_email: EmailStr
+
     slack_ci_cd_channel_id: constr(min_length=0, max_length=11) | None = None  # type: ignore
+    slack_workspace_id: constr(min_length=0, max_length=11)  # type: ignore
+
+    ms_teams_team_id: str | None = None
+    ms_teams_ci_cd_channel_id: str | None = None
 
     plugins: PipelinePluginsVars
 

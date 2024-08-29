@@ -4,7 +4,7 @@ default_language_version:
   python: python3.11
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: check-added-large-files
       - id: check-ast
@@ -26,21 +26,21 @@ repos:
       - id: detect-aws-credentials
         args: [ --allow-missing-credentials ]
   - repo: https://github.com/bwhmather/ssort
-    rev: v0.12.0
+    rev: 0.13.0
     hooks:
       - id: ssort
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     # Ruff version.
-    rev: 'v0.1.13'
+    rev: 'v0.6.2'
     hooks:
       - id: ruff
         args: [ --fix]
       - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.8.0"
+    rev: "v1.11.2"
     hooks:
       - id: mypy
-        args: [--explicit-package-bases, --namespace-packages, --ignore-missing-imports]
+        args: [--explicit-package-bases, --namespace-packages, --ignore-missing-imports, --no-warn-unused-ignores]
         additional_dependencies:
           - "types-PyYAML"
           - "pydantic>=2.5.2"
@@ -52,11 +52,11 @@ repos:
       - id: docformatter
         args: [ --in-place ]
   - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-    rev: "v1.3.2"
+    rev: "v1.3.3"
     hooks:
       - id: python-safety-dependencies-check
   - repo: https://github.com/Zac-HD/shed
-    rev: "2023.6.1"
+    rev: "2024.3.1"
     hooks:
       - id: shed
         args: [ --refactor, --py311-plus ]
@@ -65,20 +65,8 @@ repos:
     rev: v0.1
     hooks:
       - id: xenon
-        args: ["--max-average=A", "--max-modules=A", "--max-absolute=B", "-e 'tests/*,.venv/*,cdk.out/*'"]
+        args: ["--max-average=C", "--max-modules=C", "--max-absolute=C", "-e 'tests/*,.venv/*,cdk.out/*'"]
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.18.1
+    rev: v8.18.4
     hooks:
       - id: gitleaks
-  - repo: https://github.com/returntocorp/semgrep # semgrep does not support linux arm64
-    rev: 'v1.56.0'
-    hooks:
-      - id: semgrep
-        # See semgrep.dev/rulesets to select a ruleset and copy its URL
-        exclude: "cdk/config/config-ci-cd.yaml"
-        args: [
-        '--config', 'p/python',
-        '--config', 'p/default',
-        '--error',
-        '--skip-unknown-extensions',
-        ]

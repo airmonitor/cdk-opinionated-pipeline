@@ -1,12 +1,5 @@
 line-length = 120
 target-version = "py311"
-[mccabe]
-max-complexity = 15
-
-[isort]
-combine-as-imports = true
-lines-between-types = 1
-known-third-party = ["pydantic", "aws_lambda_powertools"]
 
 [format]
 preview = true
@@ -66,8 +59,7 @@ ignore = [
     "FA100", # Enable this rule when drop support to Python 3.7,
     "COM812",
     "ISC001",
-    "PLR0917",
-    "S101"
+    "PLR0917"
 ]
 
 exclude = [
@@ -98,4 +90,23 @@ exclude = [
     ".build",
     ".mypy_cache",
     ".github",
+]
+
+[lint.mccabe]
+max-complexity = 15
+
+[lint.isort]
+combine-as-imports = true
+lines-between-types = 1
+known-third-party = ["pydantic", "aws_lambda_powertools", "cdk_opinionated_constructs"]
+
+[lint.per-file-ignores]
+"services/tests/**/*.py" = [
+    # at least this three should be fine in tests:
+    "S101", # asserts allowed in tests...
+    "ARG", # Unused function args -> fixtures nevertheless are functionally relevant...
+    "FBT", # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
+    # The below are debateable
+    "PLR2004", # Magic value used in comparison, ...
+    "S311", # Standard pseudo-random generators are not suitable for cryptographic purposes
 ]

@@ -4,7 +4,7 @@ cdk-opinionated-constructs==3.9.2
 constructs==10.3.0
 docutils==0.21.2
 email-validator==2.2.0
-pydantic==2.8.2
+pydantic==2.9.1
 pydantic-core>=2.23.0
 pydoctor==24.3.3
 pyyaml==6.0.2

@@ -1,4 +1,4 @@
-boto3==1.40.55
+boto3==1.40.59
 click==8.2.1
 docutils==0.21.2
 pydoctor==24.11.2

@@ -1,6 +1,6 @@
 aws-cdk-lib==2.232.2
 cdk-nag==2.37.55
-cdk-opinionated-constructs==3.12.1
+cdk-opinionated-constructs==4.7.27
 constructs==10.4.4
 docutils==0.22.3
 email-validator==2.3.0

@@ -2,7 +2,7 @@ aws-cdk-lib==2.232.2
 cdk-nag==2.37.55
 cdk-opinionated-constructs==3.12.1
 constructs==10.4.4
-docutils==0.22.3
+docutils==0.22.4
 email-validator==2.3.0
 pydantic==2.12.5
 pydantic-core>=2.23.0

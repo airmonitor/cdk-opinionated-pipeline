@@ -125,7 +125,7 @@ def test_snapshot(stack_template, snapshot):
     """Tests that the stack template matches a snapshot.
 
     Parameters:
-    - stack_template: The CDK stack template to check. 
+    - stack_template: The CDK stack template to check.
     - snapshot: The snapshot tester to match against.
 
     Functionality:

@@ -1,0 +1,8 @@
+[allowlist]
+description = "global allow list"
+paths = [
+  '''cdk/config/dr/config.yaml''',
+  '''cdk.context.json''',
+  '''cdk/tests/infrastructure/snapshots/test_governance_stack/test_snapshot/*.yaml''',
+  '''cdk/tests/infrastructure/snapshots/test_notifications_stack/test_snapshot/*.yaml'''
+]

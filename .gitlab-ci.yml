@@ -40,7 +40,7 @@ build-job:
       - pip install -r requirements-dev.txt
       - cdk synth
 
-pre-commit-job:
+prek-job:
   image: python:3.13.3-bullseye
   stage: build
   script:
@@ -48,16 +48,16 @@ pre-commit-job:
       - git add .
       - python3 -m pip install --upgrade pip
       - pip install -r cdk/stacks/requirements.txt
-      - pre-commit run --files app.py
-      - pre-commit run --files cdk/constructs/*.py
-      - pre-commit run --files cdk/schemas/*.py
-      - pre-commit run --files cdk/stacks/*.py
-      - pre-commit run --files cdk/stages/*.py
-      - pre-commit run --files cdk/stacks/services/*.py
-      - pre-commit run --files cdk/stacks/plugins/*.py
-      - pre-commit run --files cdk/stacks/plugins/pipeline_trigger/*.py
-      - pre-commit run --files cdk/utils/*.py
-      - pre-commit run --files cdk/tests/infrastructure/*.py
+      - prek run --files app.py
+      - prek run --files cdk/constructs/*.py
+      - prek run --files cdk/schemas/*.py
+      - prek run --files cdk/stacks/*.py
+      - prek run --files cdk/stages/*.py
+      - prek run --files cdk/stacks/services/*.py
+      - prek run --files cdk/stacks/plugins/*.py
+      - prek run --files cdk/stacks/plugins/pipeline_trigger/*.py
+      - prek run --files cdk/utils/*.py
+      - prek run --files cdk/tests/infrastructure/*.py
 
 build-on-mr:
   image: python:3.13.3-bullseye
@@ -70,7 +70,7 @@ build-on-mr:
       - cdk synth
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-pre-commit-on-mr:
+prek-on-mr:
   image: python:3.13.3-bullseye
   stage: build-on-mr
   script:
@@ -78,15 +78,15 @@ pre-commit-on-mr:
       - git add .
       - python3 -m pip install --upgrade pip
       - pip install -r cdk/stacks/requirements.txt
-      - pre-commit run --files app.py
-      - pre-commit run --files cdk/constructs/*.py
-      - pre-commit run --files cdk/schemas/*.py
-      - pre-commit run --files cdk/stacks/*.py
-      - pre-commit run --files cdk/stages/*.py
-      - pre-commit run --files cdk/stacks/services/*.py
-      - pre-commit run --files cdk/stacks/plugins/*.py
-      - pre-commit run --files cdk/stacks/plugins/pipeline_trigger/*.py
-      - pre-commit run --files cdk/utils/*.py
-      - pre-commit run --files cdk/tests/infrastructure/*.py
+      - prek run --files app.py
+      - prek run --files cdk/constructs/*.py
+      - prek run --files cdk/schemas/*.py
+      - prek run --files cdk/stacks/*.py
+      - prek run --files cdk/stages/*.py
+      - prek run --files cdk/stacks/services/*.py
+      - prek run --files cdk/stacks/plugins/*.py
+      - prek run --files cdk/stacks/plugins/pipeline_trigger/*.py
+      - prek run --files cdk/utils/*.py
+      - prek run --files cdk/tests/infrastructure/*.py
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'

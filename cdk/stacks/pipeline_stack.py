@@ -8,6 +8,9 @@ import aws_cdk.aws_iam as iam
 
 from aws_cdk import pipelines
 from cdk_opinionated_constructs.stacks import create_pipeline_notifications, notifications_topic, pipeline_trigger
+from cdk_opinionated_constructs.stages.logic import (
+    default_install_commands,
+)
 from cdk_opinionated_constructs.utils import load_properties
 from constructs import Construct
 
@@ -64,12 +67,15 @@ class PipelineStack(cdk.Stack):
                 "synth",
                 input=pipelines.CodePipelineSource.code_commit(repository=imported_repository, branch="main"),
                 install_commands=[
-                    "npm install -g aws-cdk",
+                    "n 22",
                     "pip install uv",
-                    "make install",
+                    "make venv",
+                    "source .venv/bin/activate",
+                    *default_install_commands,
                 ],
                 commands=[
-                    "cdk synth",
+                    "source .venv/bin/activate",
+                    "cdk synth -q",
                 ],
             ),
             pipeline_name=pipeline_vars.project,
@@ -95,7 +101,7 @@ class PipelineStack(cdk.Stack):
         self.codepipeline.build_pipeline()
 
         create_pipeline_notifications(
-            self, notifications_sns_topic=notifications_sns_topic, pipeline_vars=pipeline_vars
+            self, notifications_sns_topic=notifications_sns_topic, pipeline_vars=pipeline_vars, source=self.codepipeline
         )
 
         pipeline_trigger(

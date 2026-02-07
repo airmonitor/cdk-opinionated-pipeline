@@ -162,7 +162,7 @@ def code_quality_stage(
         install_commands=[
             "pip install uv",
             "make install",
-            "pip install pre-commit",
+            "pip install pre-commit prek",
         ],
         commands=[
             "git init .",

@@ -4,9 +4,7 @@ from pathlib import Path
 
 import setuptools
 
-readme = Path("README.md")
-with readme.open(encoding="utf-8") as f:
-    long_description = f.read()
+long_description = Path("README.md").read_text(encoding="utf-8")
 
 setuptools.setup(
     name="ci_cd_pipeline",
@@ -17,7 +15,7 @@ setuptools.setup(
     author="Tomasz Szuster",
     package_dir={"": "cdk"},
     packages=setuptools.find_packages(where="cdk"),
-    python_requires=">=3.11",
+    python_requires=">=3.13",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",

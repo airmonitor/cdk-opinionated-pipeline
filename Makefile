@@ -1,90 +1,60 @@
-# Makefile for setting up and activating a Python virtual environment
-
 # Set the desired Python interpreter (change if needed)
-PYTHON := python3.11
-
-# Virtual environment directory
+PYTHON := python3.13
 VENV := .venv
+STAGE?=dev
 
-STAGE?=ppe
+.PHONY: all venv activate test clean prek update help
 
-# Default target
-all: venv activate install
+all: venv activate install # Initialize complete development environment
 
-# Create the virtual environment
-venv:
-	@echo "Creating Python virtual environment..."
-	$(PYTHON) -m venv $(VENV)
+venv: # Create new Python virtual environment
+	uv venv --seed --python $(PYTHON) $(VENV)
 
-# Activate the virtual environment
-activate:
-	@echo "Activating Python virtual environment..."
-	@echo "Run 'deactivate' to exit the virtual environment."
+activate: # Activate Python virtual environment
 	@. $(VENV)/bin/activate
 
-install:
-	@echo "Installing dependencies from requirements files"
+install: # Install all project dependencies and development tools
 	pip install --upgrade pip
-	pip install uv pur
-	uv pip install --system --native-tls --upgrade pip
-	uv pip install --system --native-tls -r requirements.txt
-	uv pip install --system --native-tls -r requirements-dev.txt
-	uv pip install --system --native-tls pre-commit pytest pytest-snapshot
-
-local_install:
-	@echo "Installing dependencies from requirements files"
-	pip install --upgrade pip
-	pip install uv pur
+	pip install --upgrade uv
+	uv pip install --upgrade pip
 	uv pip install -r requirements.txt
 	uv pip install -r requirements-dev.txt
-	uv pip install pre-commit pytest pytest-snapshot
+	uv pip install pytest pytest-snapshot prek
 
 
-pre-commit:
-	@echo "Running pre-commit"
-	pre-commit install
-	pre-commit run --files app.py
-	pre-commit run --files cdk/constructs/*.py
-	pre-commit run --files cdk/schemas/*.py
-	pre-commit run --files cdk/stacks/*.py
-	pre-commit run --files cdk/stacks/services/*.py
-	pre-commit run --files cdk/stages/*.py
-	pre-commit run --files cdk/tests/infrastructure/*.py
-	pre-commit run --files cdk/tests/integration/*.py
-	pre-commit run --files cdk/tests/*.py
+prek: # Run code quality checks on all Python files
+	prek install
+	prek run --files cdk/constructs/*.py
+	prek run --files cdk/schemas/*.py
+	prek run --files cdk/stacks/*.py
+	prek run --files cdk/stacks/services/*.py
+	prek run --files cdk/stages/*.py
+	prek run --files cdk/stages/logic/*.py
+	prek run --files cdk/tests/infrastructure/*.py
+	prek run --files cdk/tests/integration/*.py
+	prek run --files cdk/tests/*.py
+	prek run --files cdk/documentation/*
+	prek run --files *
+	prek run --files .github/*
+	prek run --files .github/workflows/*
 
-
-test:
-	@echo "Running pytest for stage "
+tests: # Run infrastructure tests for specified stage
 	STAGE=$(STAGE) pytest cdk/tests/infrastructure/
 
-update-tests:
-	@echo "Updating pytest snapshots"
+update-tests: # Update infrastructure test snapshots
 	STAGE=$(STAGE) pytest --snapshot-update cdk/tests/infrastructure/
 
-update:
-	@echo "Updating used tools and scripts"
+update: # Update all dependencies and tools to latest versions
 	pur -r requirements.txt
 	pur -r requirements-dev.txt
-	pre-commit autoupdate
+	prek autoupdate
 
-clean:
-	@echo "Cleaning up..."
+clean: # Remove virtual environment and cleanup project files
 	rm -rf $(VENV)
+	rm -rf cdk.out
+	prek clean
+	prek gc
 
-help:
-	@echo "Available commands:"
-	@echo "  all              - Create venv, activate it, and install dependencies"
-	@echo "  venv             - Create the Python virtual environment"
-	@echo "  activate         - Activate the Python virtual environment"
-	@echo "  install          - Install dependencies from requirements files"
-	@echo "  local_install    - Install dependencies locally, including layer requirements"
-	@echo "  pre-commit       - Install and run pre-commit hooks on all files"
-	@echo "  test             - Run pytest for the specified stage (default: ppe)"
-	@echo "  update-tests     - Update pytest snapshots"
-	@echo "  update           - Update dependencies and pre-commit hooks"
-	@echo "  clean            - Remove the virtual environment and clean up"
-	@echo "  help             - Display this help message"
-
-
-.PHONY: all venv activate test clean pre-commit update help
+help: # Display this help message
+	@printf "\n\033[1;32mAvailable commands: \033[00m\n\n"
+	@awk 'BEGIN {FS = ":.*#"; printf "\033[36m%-30s\033[0m %s\n", "target", "help"} /^[a-zA-Z0-9_-]+:.*?#/ { printf "\033[36m%-30s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)

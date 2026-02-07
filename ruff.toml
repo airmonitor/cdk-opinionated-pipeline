@@ -1,5 +1,5 @@
 line-length = 120
-target-version = "py311"
+target-version = "py313"
 
 [format]
 preview = true
@@ -25,6 +25,7 @@ select = [
     "FIX", # flake8-fixme - https://beta.ruff.rs/docs/rules/#flake8-fixme-fix
     "FURB", # refurb - https://docs.astral.sh/ruff/rules/#refurb-furb
     "F", # pyflakes - https://beta.ruff.rs/docs/rules/#pyflakes-f
+    "G", # logging format - https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
     "I", # isort - https://beta.ruff.rs/docs/rules/#isort-i
     "ICN", # flake8-import-conventions - https://beta.ruff.rs/docs/rules/#flake8-import-conventions-icn
     "ISC", # flake8-implicit-str-concat - https://beta.ruff.rs/docs/rules/#flake8-implicit-str-concat-isc
@@ -59,7 +60,9 @@ ignore = [
     "FA100", # Enable this rule when drop support to Python 3.7,
     "COM812",
     "ISC001",
-    "PLR0917"
+    "PLR0917",
+    "SIM117",
+    "RUF052"
 ]
 
 exclude = [

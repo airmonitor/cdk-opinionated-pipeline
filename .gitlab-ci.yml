@@ -31,7 +31,7 @@ stages:
 
 
 build-job:
-  image: python:3.11.3-bullseye
+  image: python:3.13.3-bullseye
   stage: build
   script:
       - curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
@@ -41,7 +41,7 @@ build-job:
       - cdk synth
 
 pre-commit-job:
-  image: python:3.11.3-bullseye
+  image: python:3.13.3-bullseye
   stage: build
   script:
       - git init .
@@ -60,7 +60,7 @@ pre-commit-job:
       - pre-commit run --files cdk/tests/infrastructure/*.py
 
 build-on-mr:
-  image: python:3.11.3-bullseye
+  image: python:3.13.3-bullseye
   stage: build-on-mr
   script:
       - curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
@@ -71,7 +71,7 @@ build-on-mr:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 pre-commit-on-mr:
-  image: python:3.11.3-bullseye
+  image: python:3.13.3-bullseye
   stage: build-on-mr
   script:
       - git init .

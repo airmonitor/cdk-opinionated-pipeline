@@ -1,4 +1,4 @@
-boto3==1.42.16
+boto3==1.42.49
 click==8.3.1
 diagrams==0.25.1
 docutils==0.22.4
